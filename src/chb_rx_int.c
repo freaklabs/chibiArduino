@@ -38,7 +38,11 @@
 
 */
 /**************************************************************************/
-#include "WProgram.h"
+#if ARDUINO >= 100
+#include <Arduino.h>
+#else
+#include <WProgram.h>
+#endif
 #include "chb.h"
 #include "chb_drvr.h"
 #include "chb_spi.h"
