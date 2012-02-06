@@ -41,7 +41,13 @@
 #ifndef CHIBI_H
 #define CHIBI_H
 
-#include <WProgram.h>
+// For handling Arduino 1.0 compatibility and backwards compatibility
+#if ARDUINO >= 100
+    #include "Arduino.h"
+#else
+    #include <WProgram.h>
+#endif
+
 #include "chibiUsrCfg.h"
 
 #define BROADCAST_ADDR 0xFFFF

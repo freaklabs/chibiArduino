@@ -39,9 +39,15 @@
 */
 /**************************************************************************/
 #include <avr/pgmspace.h>
-#include "WProgram.h"
 #include "HardwareSerial.h"
 #include "chb_cmd.h"
+
+// For handling Arduino 1.0 compatibility and backwards compatibility
+#if ARDUINO >= 100
+    #include "Arduino.h"
+#else
+    #include "WProgram.h"
+#endif
 
 // command line message buffer and pointer
 static uint8_t msg[MAX_MSG_SIZE];

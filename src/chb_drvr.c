@@ -32,12 +32,18 @@
 
 *******************************************************************/
 #include <avr/pgmspace.h>
-#include "WProgram.h"
 #include "chb.h"
 #include "chb_drvr.h"
 #include "chb_buf.h"
 #include "chb_spi.h"
 #include "chb_eeprom.h"
+
+// For handling Arduino 1.0 compatibility and backwards compatibility
+#if ARDUINO >= 100
+    #include "Arduino.h"
+#else
+    #include <WProgram.h>
+#endif
 
 #if (CHB_RX_POLLING_MODE)
    #include "chb_rx_poll.h"

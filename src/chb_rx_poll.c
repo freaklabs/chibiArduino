@@ -38,7 +38,14 @@
 
 */
 /**************************************************************************/
-#include "WProgram.h"
+
+// For Arduino 1.0 compatibility and backwards compatibility
+#if ARDUINO >= 100
+    #include "Arduino.h"
+#else
+    #include "WProgram.h"
+#endif
+
 #include "chb.h"
 #include "chb_drvr.h"
 #include "chb_spi.h"
