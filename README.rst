@@ -18,9 +18,9 @@ Date
 Introduction
 ============
 
-The chibiArduino protocol stack is a port of the Chibi 802.15.4 wireless stack to the Arduino platform. The stack was designed to be simple, easy to use, and have a very small memory foot- print. As of this writing, the stack footprint is approximately 300 bytes of RAM and 3.8 kB of flash.
+The chibiArduino protocol stack is a port of the Chibi 802.15.4 wireless stack to the Arduino platform. The stack was designed to be simple, easy to use, and have a very small memory footprint. As of this writing, the stack footprint is approximately 300 bytes of RAM and 3.8 kB of flash.
 
-Chibi was created as a tool to introduce people to wireless communications and sensor network- ing. There are a number of protocols for wireless communications and sensor networking but most of them are complex with sophisticated features. In contrast, many people in the hobbyist and hacker communities just want something to send and receive small amounts of data without having to understand a lot of protocol complexity.
+Chibi was created as a tool to introduce people to wireless communications and sensor networking. There are a number of protocols for wireless communications and sensor networking but most of them are complex with sophisticated features. In contrast, many people in the hobbyist and hacker communities just want something to send and receive small amounts of data without having to understand a lot of protocol complexity.
 
 For simplicity, chibi relies mainly on three functions: init, send, and receive. There are also other functions available for management or configuration, however with just the basic initialization function, the default settings can allow people to start communicating wirelessly.
 
@@ -64,7 +64,7 @@ This would set the node up, change the network address to 0xAAAA (the address us
 Transmitting
 ------------
 
-Transmitting data requires three things: a destination address to transmit the data to, the actual data, and the length of the data. Performing a simple “hello world” transmission would go some- thing like this:
+Transmitting data requires three things: a destination address to transmit the data to, the actual data, and the length of the data. Performing a simple “hello world” transmission would go something like this:
 
 ::
 
@@ -91,7 +91,7 @@ Another example of wireless transmission would be something like this:
       delay(500);
   }
 
-This code reads data from an accelerometer, broadcasts it to all nodes in the same network, and then waits for 500 msec before repeating the process. CHIBI_BROADCAST_ADDR is defined inside the chibiArduino stack and contains the value of 0xFFFF. This is the reserved address de- fined by the 802.15.4 specification for broadcast transmissions and all nodes on the same network will receive transmissions to this address.
+This code reads data from an accelerometer, broadcasts it to all nodes in the same network, and then waits for 500 msec before repeating the process. CHIBI_BROADCAST_ADDR is defined inside the chibiArduino stack and contains the value of 0xFFFF. This is the reserved address defined by the 802.15.4 specification for broadcast transmissions and all nodes on the same network will receive transmissions to this address.
 
 ---------
 Receiving
@@ -131,8 +131,8 @@ In this case, there were two variables created. The “len” variable is used t
 Command Line Operation
 ======================
 
-The cmdArduino library has been integrated into the chibiArduino communications stack because it makes many things very convenient. Having an interactive command line makes things like set- ting different network addresses for each node very simple. It also gives the user control over when to send data and provides visual feedback on what kind of data arrived. Since the command line is configurable to call user functions, anything you might want to do such as reading the radio registers, MCU registers, toggling an I/O, or whatever else might want to be done is also possible interactively.
+The cmdArduino library has been integrated into the chibiArduino communications stack because it makes many things very convenient. Having an interactive command line makes things like setting different network addresses for each node very simple. It also gives the user control over when to send data and provides visual feedback on what kind of data arrived. Since the command line is configurable to call user functions, anything you might want to do such as reading the radio registers, MCU registers, toggling an I/O, or whatever else might want to be done is also possible interactively.
 
-For a detailed tutorial on how to use the command line, please refer to the cmdArduino tuto- rial on the FreakLabs website. All the functions are the same except they are prefixed with
+For a detailed tutorial on how to use the command line, please refer to the cmdArduino tutorial on the FreakLabs website. All the functions are the same except they are prefixed with
 “chibi”. For example, “cmdInit()” in the tutorial becomes “chibiCmdInit()” when accessed through the chibiArduino stack.
 
