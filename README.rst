@@ -166,20 +166,63 @@ These parameters are used to set the addresses in EEPROM where the IEEE or short
 --------------
 CHB_SLPTR_PORT 
 --------------
+
 -------------
 CHB_SLPTR_DDR
 -------------
+
 -------------
 CHB_SLPTR_PIN
 -------------
-The SLP_TR pin on the radio controls the sleep mode of the radio. When the radio is not in use and power savings is desired, then the device can be put to sleep by bringing this pin low. This
-is handled in the chibiSleepRadio() function which relies on this pin definition of the SLP_TR pin.
-CHB_RADIO_IRQ CFG_CHB_INTP CHB_IRQ_ENABLE/DISABLE
+
+The SLP_TR pin on the radio controls the sleep mode of the radio. When the radio is not in use and power savings is desired, then the device can be put to sleep by bringing this pin low. This is handled in the chibiSleepRadio() function which relies on this pin definition of the SLP_TR pin.
+
+-------------
+CHB_RADIO_IRQ
+-------------
+
+------------
+CFG_CHB_INTP
+------------
+
+----------------------
+CHB_IRQ_ENABLE/DISABLE
+----------------------
+
 These parameters set up the interrupt pin for the radio. The RADIO_IRQ parameter defines which interrupt vector will be used and is based on the pin that the interrupt goes to. The CFG_ CHB_INTP parameter contains the code needed to initialize the interrupt and put it in the proper mode of operation, ie: rising edge, falling edge, etc. The IRQ_ENABLE/DISABLE con- tains the code to enable or disable the IRQ and is only used if RX_POLLING_MODE is set to 1.
+
+---------------
 CHB_SPI_CS_PORT
+---------------
+
+---------------
 CHB_SPI_CS_DDIR
+---------------
+
+--------------
 CHB_SPI_CS_PIN
+--------------
+
 These parameters set up the SPI’s chip select pin. This pin needs to map to the microcontroller pin connected to the radio’s SPI’s chip select. The port and direction register must also be specified in order for the radio to work properly.
+
+chibiArduino API List
+=====================
+
+This is a list of the default functions available in the chibiArduino wireless stack.
+
+----------------
+void chibiInit()
+----------------
+
+Usage: This is the initialization function for the chibiArduino stack and needs to be in the
+setup() area of the arduino code.
+
+::
+
+  void setup()
+  {
+      chibiInit();
+  }
 
 
 
