@@ -4,6 +4,10 @@ chibiArduino - Wireless Protocol Stack
 
 HOWTO: Using the chibiArduino Wireless Protocol Stack v0.5
 
+- chibiArduino is a lightweight 802.15.4 wireless protocol stack for Arduino
+
+  - http://freaklabs.org/index.php/chibiArduino.html
+
 Document Revision History
 =========================
 
