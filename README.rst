@@ -228,5 +228,173 @@ setup() area of the arduino code.
       chibiInit();
   }
 
+-----------------------------------------
+void chibiSetShortAddr(unsigned int addr)
+-----------------------------------------
+
+Usage: This function sets the short address of the wireless node. It writes the short address into the EEPROM at the CHB_EEPROM_SHORTADDR position and also writes it into the radio’s RAM. The radio will then automatically filter frames and only accept ones sent to this address or the broadcast address. On initialization, the short address is automatically loaded from the EEPROM to the radio.
+
+::
+
+  chibiSetShortAddr(0x1234);
+
+Sets the 16-bit short address of the node to 0x1234.
+
+------------------------
+void chibiGetShortAddr()
+------------------------
+
+Usage: Gets the short address of the node from the EEPROM.
+
+::
+
+  unsigned int addr;
+  addr = chibiGetShortAddr();
+
+Retrieves the short address from the EEPROM.
+
+----------------------------------
+void chibiSetIEEEAddr(byte addr[])
+----------------------------------
+
+Usage: Sets the 64-bit IEEE address of the node in EEPROM and in the radio. The IEEE ad- dress is not used in the chibiArduino stack but may be used by an application. The IEEE ad- dress is a unique identifier different for all nodes in existence. Ideally, a block of IEEE addresses should be purchased from the IEEE to take advantage of the uniqueness. However this address can also be used to store 8 character messages that describe the node.
+
+::
+
+  byte addr[8]=”HUMIDTY”;
+  chibiSetIEEEADDR(addr);
+
+Sets the IEEE address to the byte array representing HUMIDTY.
+
+----------------------------------
+void chibiGetIEEEAddr(byte addr[])
+----------------------------------
+
+Usage: Retrieves the 64-bit IEEE address of the node from EEPROM. A byte array needs to be
+passed in and will store the address.
+
+::
+
+  byte addr[8];
+  chibiGetIEEEAddr(addr);
+
+Gets the IEEE address and stores it in the byte array.
+
+----------------------------
+byte chibiRegRead(byte addr)
+----------------------------
+
+Usage: Reads the radio’s register at the given address. In normal operation, this should not
+be needed, however it may be useful for debugging purposes or if the user wants to check the register settings in the radio. An enumerated list of all the register addresses in the radio can be found in the chb_drvr.h file.
+
+::
+
+  byte version = chibiRegRead(VERSION_NUM);
+
+Reads the version number of the radio IC.
+
+----------------------------------------
+void chibiRegWrite(byte addr, byte data)
+----------------------------------------
+
+Usage: Writes the specified data to the radio’s register at the address specified. In normal opera- tion, this will probably not be used but can be used if the user wants to experiment with differ- ent register settings for the radio.
+
+::
+
+  byte data = 0xFF;
+  chibiRegWrite(VERSION_NUM, data);
+
+Writes 0xFF to the VERSION_NUM register in the radio. This will have no effect since the version register is read-only.
+
+---------------------------------------------------------
+byte chibiTx(unsigned int address, byte data[], byte len)
+---------------------------------------------------------
+
+Usage: This is the main function to send data. The first argument is the destination address of the node the data will be going to. To send to all nodes, the reserved broadcast address 0xFFFF can be used and the data will go out to all nodes in the same network within listening distance. The second argument is a byte array containing the data to be sent. The third argument is the length of the data in the byte array. The function returns the status of the transmission and an enumerated list of the return codes can be found in src/chb_drvr.h.
+
+::
+
+  byte status, data[CHB_MAX_PAYLOAD];
+  for (int i=0; i<CHB_MAX_PAYLOAD; i++)
+  {
+      data[i] = i;
+  }
+  status = chibiTx(0xFFFF, data, CHB_MAX_PAYLOAD);
+
+This example fills a byte array with sequential numbers up to the max payload size. It then broadcasts it to all nodes and returns the status of the transmission.
+
+--------------------
+byte chibiDataRcvd()
+--------------------
+
+Usage: This function returns TRUE if new data was received and is ready to be picked up. If CHB_RX_POLLING_MODE is 0, the data has already been moved to a temporary storage area in memory so that new data won’t overwrite it. If CHB_RX_POLLING_MODE is 1, the data is still in the radio and calling this function will retrieve the data from the radio and move it into temporary storage in memory..
+
+::
+
+  if (chibiDataRcvd() == true)
+  {
+      Serial.println(“New data has arrived.”);
+  }
+
+------------------------------
+byte chibiGetData(byte data[])
+------------------------------
+
+Usage: This function retrieves the data from the temporary storage in memory (receive buffer) and puts it into the specified byte array. It returns the length of the data that was written into the array.
+
+::
+
+  if (chibiDataRcvd() == true)
+  {
+      byte len, data[CHB_MAX_PAYLOAD];
+      len = chibiGetData(data);
+  }
+
+This example checks to see if data was received. If new data has arrived, then it will retrieve the data, store it in the specified byte array, and store the length of the data.
+
+-------------------
+byte chibiGetRSSI()
+-------------------
+
+Usage: Gets the signal strength of the last received data frame. The range of the signal strength is 84 (-7 dB ) to 0 (-91 dB) for the AT86RF230 with an accuracy of +/- 5 dB.
+
+::
+
+  byte rssi = chibiGetRSSI();
+  Serial.print(“RSSI = “); Serial.println(rssi, HEX);
+
+---------------------
+int chibiGetSrcAddr()
+---------------------
+
+Usage: Gets the source address for the most recently received frame. This is useful to figure out who originated the frame so that the data could be processed accordingly.
+
+::
+
+  int src_addr = chibiGetSrcAddr();
+  Serial.print(“Source Address = 0x”);
+  Serial.println(src_addr, HEX);
+
+----------------------------------
+byte chibiSetChannel(byte channel)
+----------------------------------
+
+Usage: This sets the channel of the radio. The default channel the radio is initialized to is con- figured in chibiUsrCfg.h. If the channel needs to be dynamically changed, this function can be used. According to the IEEE 802.15.4 specification, there are 16 channels in the 2.4 GHz band from channel 11 to channel 26. When specifying the channel to change to, the values must be within this range. The function returns the status of the channel change.
+
+::
+
+  chibiSetChannel(15);
+
+Changes the channel the radio uses to channel 15. Incidentally, this channel will not interfere with any Wi-Fi channels.
+
+---------------------------------
+void chibiSleepRadio(byte enable)
+---------------------------------
+
+Usage: Put the radio into sleep mode. When in sleep mode, the radio will not be able to send or receive data. This is typically used to save power when the radio is not needed. A non-zero argument will enable sleep mode. An argument of 0 (false) will disable it and put it into receive mode.
+
+::
+
+  chibiSleepRadio(true);
 
 
