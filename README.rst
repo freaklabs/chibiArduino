@@ -31,3 +31,9 @@ The chibiArduino software also integrates a command line which can be optionally
 Operation
 =========
 
+chibiArduino usage is fairly straightforward and just consists of initializing/configuring the node and setting up when the sending and receiving will take place.
+
+--------------
+Initialization
+--------------
+
