@@ -133,6 +133,6 @@ Command Line Operation
 
 The cmdArduino library has been integrated into the chibiArduino communications stack because it makes many things very convenient. Having an interactive command line makes things like setting different network addresses for each node very simple. It also gives the user control over when to send data and provides visual feedback on what kind of data arrived. Since the command line is configurable to call user functions, anything you might want to do such as reading the radio registers, MCU registers, toggling an I/O, or whatever else might want to be done is also possible interactively.
 
-For a detailed tutorial on how to use the command line, please refer to the cmdArduino tutorial on the FreakLabs website. All the functions are the same except they are prefixed with
+For a detailed tutorial on how to use the command line, please `refer to the cmdArduino tutorial on the FreakLabs website <http://freaklabs.org/index.php/Tutorials/Software/Tutorial-Using-CmdArduino.html>`_. All the functions are the same except they are prefixed with
 “chibi”. For example, “cmdInit()” in the tutorial becomes “chibiCmdInit()” when accessed through the chibiArduino stack.
 
