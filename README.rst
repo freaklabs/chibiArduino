@@ -136,3 +136,50 @@ The cmdArduino library has been integrated into the chibiArduino communications 
 For a detailed tutorial on how to use the command line, please `refer to the cmdArduino tutorial on the FreakLabs website <http://freaklabs.org/index.php/Tutorials/Software/Tutorial-Using-CmdArduino.html>`_. All the functions are the same except they are prefixed with
 “chibi”. For example, “cmdInit()” in the tutorial becomes “chibiCmdInit()” when accessed through the chibiArduino stack.
 
+Configuration Parameters
+========================
+
+The configuration parameters for the chibiArduino stack are contained in the “chibiUsrCfg.h” file in the main Chibi directory. There are detailed descriptions of each parameter in the file, but a few of the parameters are listed here for further description of their functionality.
+
+-------------------
+CHB_RX_POLLING_MODE
+-------------------
+
+This is an interesting parameter. When data arrives into the radio, the radio will inform the micro- controller via an interrupt. There are two ways to handle this. One is to move the data immedi- ately via an interrupt service routine and the other is to flag the interrupt and move it at the next available time the MCU is free. Both of these methods are supported in this stack because there is a bit of debate within the Arduino community about what can be done inside an interrupt service routine. In some cases, like in a very busy system with many strict timing requirements, taking the time to move data inside an interrupt service routine might not be possible without violating the timing of some other driver. In other cases, the communication data is high priority and so it needs to be moved as quickly as possible before more data is received. Because of the wide appli- cation scenarios that the Arduino could be put in, both methods were implemented. The default is that the communications data is high priority and will be moved inside the interrupt service routine however this can be turned off by changing this parameter from 0 to 1.
+
+In the interrupt based receiving mode, you get the data out of the radio as quickly as possible and store it into the microcontroller’s memory where it can be retrieved later by the application. The reason you’d want to do this is if the data isn’t moved off the radio before the next frame arrives, the next frame will overwrite the previous frame and you’ll lose that data. If you set this parameter to 0 (default), the data will be moved inside the interrupt service routine which means that mov- ing the data takes priority over all other tasks.
+
+In the polling based receiving mode, once the radio issues an interrupt signaling data arrival, you flag the interrupt and service it at the next available opportunity. This means that moving the data occurs outside of the interrupt service routine and is not considered a high priority. When the chibiDataRcvd() function is called, it will poll the receive interrupt flag and if it happens to be set, it will access the radio and remove any data inside of it into memory. Setting this parameter to 1 enables this mode. The downside is that if another wireless data frame comes in before the MCU has a chance to retrieve the data from the radio, then the original data will be lost. Incidentally, if the Arduino Ethernet shield is used, then the CHB_RX_POLLING_MODE will need to be set to 1 due to a problem it has with other devices accessing the SPI bus from an interrupt. This can also be worked around with a code modification to the ethernet library.
+
+---------------
+CHB_MAX_PAYLOAD
+---------------
+
+As mentioned before, the maximum payload size for a data frame using the chibiArduino stack is 116 bytes. By default, the CHB_MAX_PAYLOAD is set to 100 which allows for some extra overhead. However its possible to set this to the max payload size as well.
+
+--------------------------
+CHB_EEPROM_IEEE/SHORT_ADDR
+--------------------------
+
+These parameters are used to set the addresses in EEPROM where the IEEE or short addresses will be stored. Each device should have unique addresses stored in the EEPROM so its important to set this address so that it won’t get overwritten by any other code that writes to the EEPROM.
+
+--------------
+CHB_SLPTR_PORT 
+--------------
+-------------
+CHB_SLPTR_DDR
+-------------
+-------------
+CHB_SLPTR_PIN
+-------------
+The SLP_TR pin on the radio controls the sleep mode of the radio. When the radio is not in use and power savings is desired, then the device can be put to sleep by bringing this pin low. This
+is handled in the chibiSleepRadio() function which relies on this pin definition of the SLP_TR pin.
+CHB_RADIO_IRQ CFG_CHB_INTP CHB_IRQ_ENABLE/DISABLE
+These parameters set up the interrupt pin for the radio. The RADIO_IRQ parameter defines which interrupt vector will be used and is based on the pin that the interrupt goes to. The CFG_ CHB_INTP parameter contains the code needed to initialize the interrupt and put it in the proper mode of operation, ie: rising edge, falling edge, etc. The IRQ_ENABLE/DISABLE con- tains the code to enable or disable the IRQ and is only used if RX_POLLING_MODE is set to 1.
+CHB_SPI_CS_PORT
+CHB_SPI_CS_DDIR
+CHB_SPI_CS_PIN
+These parameters set up the SPI’s chip select pin. This pin needs to map to the microcontroller pin connected to the radio’s SPI’s chip select. The port and direction register must also be specified in order for the radio to work properly.
+
+
+
