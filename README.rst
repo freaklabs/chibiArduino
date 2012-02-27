@@ -149,9 +149,9 @@ The configuration parameters for the chibiArduino stack are contained in the “
 CHB_RX_POLLING_MODE
 -------------------
 
-This is an interesting parameter. When data arrives into the radio, the radio will inform the micro- controller via an interrupt. There are two ways to handle this. One is to move the data immedi- ately via an interrupt service routine and the other is to flag the interrupt and move it at the next available time the MCU is free. Both of these methods are supported in this stack because there is a bit of debate within the Arduino community about what can be done inside an interrupt service routine. In some cases, like in a very busy system with many strict timing requirements, taking the time to move data inside an interrupt service routine might not be possible without violating the timing of some other driver. In other cases, the communication data is high priority and so it needs to be moved as quickly as possible before more data is received. Because of the wide appli- cation scenarios that the Arduino could be put in, both methods were implemented. The default is that the communications data is high priority and will be moved inside the interrupt service routine however this can be turned off by changing this parameter from 0 to 1.
+This is an interesting parameter. When data arrives into the radio, the radio will inform the microcontroller via an interrupt. There are two ways to handle this. One is to move the data immediately via an interrupt service routine and the other is to flag the interrupt and move it at the next available time the MCU is free. Both of these methods are supported in this stack because there is a bit of debate within the Arduino community about what can be done inside an interrupt service routine. In some cases, like in a very busy system with many strict timing requirements, taking the time to move data inside an interrupt service routine might not be possible without violating the timing of some other driver. In other cases, the communication data is high priority and so it needs to be moved as quickly as possible before more data is received. Because of the wide application scenarios that the Arduino could be put in, both methods were implemented. The default is that the communications data is high priority and will be moved inside the interrupt service routine however this can be turned off by changing this parameter from 0 to 1.
 
-In the interrupt based receiving mode, you get the data out of the radio as quickly as possible and store it into the microcontroller’s memory where it can be retrieved later by the application. The reason you’d want to do this is if the data isn’t moved off the radio before the next frame arrives, the next frame will overwrite the previous frame and you’ll lose that data. If you set this parameter to 0 (default), the data will be moved inside the interrupt service routine which means that mov- ing the data takes priority over all other tasks.
+In the interrupt based receiving mode, you get the data out of the radio as quickly as possible and store it into the microcontroller’s memory where it can be retrieved later by the application. The reason you’d want to do this is if the data isn’t moved off the radio before the next frame arrives, the next frame will overwrite the previous frame and you’ll lose that data. If you set this parameter to 0 (default), the data will be moved inside the interrupt service routine which means that moving the data takes priority over all other tasks.
 
 In the polling based receiving mode, once the radio issues an interrupt signaling data arrival, you flag the interrupt and service it at the next available opportunity. This means that moving the data occurs outside of the interrupt service routine and is not considered a high priority. When the chibiDataRcvd() function is called, it will poll the receive interrupt flag and if it happens to be set, it will access the radio and remove any data inside of it into memory. Setting this parameter to 1 enables this mode. The downside is that if another wireless data frame comes in before the MCU has a chance to retrieve the data from the radio, then the original data will be lost. Incidentally, if the Arduino Ethernet shield is used, then the CHB_RX_POLLING_MODE will need to be set to 1 due to a problem it has with other devices accessing the SPI bus from an interrupt. This can also be worked around with a code modification to the ethernet library.
 
@@ -193,7 +193,7 @@ CFG_CHB_INTP
 CHB_IRQ_ENABLE/DISABLE
 ----------------------
 
-These parameters set up the interrupt pin for the radio. The RADIO_IRQ parameter defines which interrupt vector will be used and is based on the pin that the interrupt goes to. The CFG_ CHB_INTP parameter contains the code needed to initialize the interrupt and put it in the proper mode of operation, ie: rising edge, falling edge, etc. The IRQ_ENABLE/DISABLE con- tains the code to enable or disable the IRQ and is only used if RX_POLLING_MODE is set to 1.
+These parameters set up the interrupt pin for the radio. The RADIO_IRQ parameter defines which interrupt vector will be used and is based on the pin that the interrupt goes to. The CFG_ CHB_INTP parameter contains the code needed to initialize the interrupt and put it in the proper mode of operation, ie: rising edge, falling edge, etc. The IRQ_ENABLE/DISABLE contains the code to enable or disable the IRQ and is only used if RX_POLLING_MODE is set to 1.
 
 ---------------
 CHB_SPI_CS_PORT
@@ -257,7 +257,7 @@ Retrieves the short address from the EEPROM.
 void chibiSetIEEEAddr(byte addr[])
 ----------------------------------
 
-Usage: Sets the 64-bit IEEE address of the node in EEPROM and in the radio. The IEEE ad- dress is not used in the chibiArduino stack but may be used by an application. The IEEE ad- dress is a unique identifier different for all nodes in existence. Ideally, a block of IEEE addresses should be purchased from the IEEE to take advantage of the uniqueness. However this address can also be used to store 8 character messages that describe the node.
+Usage: Sets the 64-bit IEEE address of the node in EEPROM and in the radio. The IEEE address is not used in the chibiArduino stack but may be used by an application. The IEEE address is a unique identifier different for all nodes in existence. Ideally, a block of IEEE addresses should be purchased from the IEEE to take advantage of the uniqueness. However this address can also be used to store 8 character messages that describe the node.
 
 ::
 
@@ -297,7 +297,7 @@ Reads the version number of the radio IC.
 void chibiRegWrite(byte addr, byte data)
 ----------------------------------------
 
-Usage: Writes the specified data to the radio’s register at the address specified. In normal opera- tion, this will probably not be used but can be used if the user wants to experiment with differ- ent register settings for the radio.
+Usage: Writes the specified data to the radio’s register at the address specified. In normal operation, this will probably not be used but can be used if the user wants to experiment with different register settings for the radio.
 
 ::
 
@@ -379,7 +379,7 @@ Usage: Gets the source address for the most recently received frame. This is use
 byte chibiSetChannel(byte channel)
 ----------------------------------
 
-Usage: This sets the channel of the radio. The default channel the radio is initialized to is con- figured in chibiUsrCfg.h. If the channel needs to be dynamically changed, this function can be used. According to the IEEE 802.15.4 specification, there are 16 channels in the 2.4 GHz band from channel 11 to channel 26. When specifying the channel to change to, the values must be within this range. The function returns the status of the channel change.
+Usage: This sets the channel of the radio. The default channel the radio is initialized to is configured in chibiUsrCfg.h. If the channel needs to be dynamically changed, this function can be used. According to the IEEE 802.15.4 specification, there are 16 channels in the 2.4 GHz band from channel 11 to channel 26. When specifying the channel to change to, the values must be within this range. The function returns the status of the channel change.
 
 ::
 
