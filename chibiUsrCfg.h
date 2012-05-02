@@ -121,9 +121,17 @@
         CHB_SLPTR_PIN default 2 on the chibiduino.
 */
 /**************************************************************************/
+#if defined(__AVR_ATmega1284P__)
+/* for bGeigie2 board using 1284P */
+#define CHB_SLPTR_PORT       PORTA
+#define CHB_SLPTR_DDIR       DDRA
+#define CHB_SLPTR_PIN        2
+#else
+/* for standard freakduino */
 #define CHB_SLPTR_PORT       PORTC
 #define CHB_SLPTR_DDIR       DDRC
 #define CHB_SLPTR_PIN        2
+#endif
 
 /**************************************************************************/
 /*!
@@ -135,9 +143,18 @@
         CHB_SPI_CS_PIN default 3 on the chibiduino.
 */
 /**************************************************************************/
+#if defined(__AVR_ATmega1284P__)
+/* for bGeigie2 board using 1284P */
+#define CHB_SPI_CS_PORT PORTA
+#define CHB_SPI_CS_DDIR DDRA
+#define CHB_SPI_CS_PIN  3                 // PA.3 - SPI Chip Select (SSEL)
+
+#else
+/* for standard freakduino */
 #define CHB_SPI_CS_PORT PORTC
 #define CHB_SPI_CS_DDIR DDRC
 #define CHB_SPI_CS_PIN  3                 // PC.3 - SPI Chip Select (SSEL)
+#endif
 
 
 /**************************************************************************/
@@ -148,7 +165,14 @@
         CHB_RADIO_IRQ default PCINT0_vect on the chibiduino
 */
 /**************************************************************************/
+#if defined(__AVR_ATmega1284P__)
+/* for bGeigie2 board using 1284P (PC6) */
+#define CHB_RADIO_IRQ       PCINT2_vect
+
+#else
+/* for standard freakduino (PB6) */
 #define CHB_RADIO_IRQ       PCINT0_vect
+#endif
     
 /**************************************************************************/    
 /*!
@@ -157,12 +181,24 @@
 */
 /**************************************************************************/    
 // enable rising edge interrupt on IRQ0
+#if defined(__AVR_ATmega1284P__)
+/* for bGeigie2 board using 1284P */
+#define CFG_CHB_INTP() do               \
+            {                           \
+                PCMSK2 |= _BV(PCINT22);  \
+                PCICR |= _BV(PCIE2);    \
+            }                           \ 
+            while(0)
+
+#else
+/* for standard freakduino (atmega328p) */
 #define CFG_CHB_INTP() do               \
             {                           \
                 PCMSK0 |= _BV(PCINT6);  \
                 PCICR |= _BV(PCIE0);    \
             }                           \ 
             while(0)
+#endif
 
 /**************************************************************************/
 /*!

@@ -63,7 +63,14 @@ ISR(CHB_RADIO_IRQ)
     CHB_ENTER_CRIT();
 
     // get the pin's value to check whether it was a rising or falling edge.
+#if defined(__AVR_ATmega1284P__)
+    /* for bGeigie2 board using 1284P (PC6) */
+    pinval = PINC & _BV(PINC6);
+#else
+    /* for standard freakduino (PB6) */
     pinval = PINB & _BV(PINB6);
+#endif
+
 
     // we'll only enter the ISR if the interrupt is a positive edge.  
     if (pinval)
