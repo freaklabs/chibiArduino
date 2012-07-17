@@ -122,7 +122,7 @@
 */
 /**************************************************************************/
 #if defined(__AVR_ATmega1284P__)
-/* for bGeigie2 board using 1284P */
+/* for bGeigie2 board using 1284P PORTA2 */
 #define CHB_SLPTR_PORT       PORTA
 #define CHB_SLPTR_DDIR       DDRA
 #define CHB_SLPTR_PIN        2
@@ -145,9 +145,9 @@
 /**************************************************************************/
 #if defined(__AVR_ATmega1284P__)
 /* for bGeigie2 board using 1284P */
-#define CHB_SPI_CS_PORT PORTA
-#define CHB_SPI_CS_DDIR DDRA
-#define CHB_SPI_CS_PIN  3                 // PA.3 - SPI Chip Select (SSEL)
+#define CHB_SPI_CS_PORT PORTD
+#define CHB_SPI_CS_DDIR DDRD
+#define CHB_SPI_CS_PIN  5                 // PD.5 - SPI Chip Select (SSEL)
 
 #else
 /* for standard freakduino */
