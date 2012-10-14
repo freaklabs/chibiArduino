@@ -591,7 +591,7 @@ U8 chb_tx(U8 *hdr, U8 *data, U8 len)
     Initialize the radio registers.
 */
 /**************************************************************************/
-static void chb_radio_init()
+static U8 chb_radio_init()
 {
     U8 ieee_addr[8];
 
@@ -662,7 +662,13 @@ static void chb_radio_init()
         // grab the error message from flash & print it out
         strcpy_P(buf, chb_err_init);
         Serial.print(buf);
+
+        // return error status
+        return 0;
     }
+
+    // If we reach this point, report success
+    return 1;
 }
 
 /**************************************************************************/
@@ -670,7 +676,7 @@ static void chb_radio_init()
     Initialize the complete driver.
 */
 /**************************************************************************/
-void chb_drvr_init()
+U8 chb_drvr_init()
 {
     // config SPI for at86rf230 access
     chb_spi_init();
@@ -679,7 +685,7 @@ void chb_drvr_init()
     CHB_SLPTR_DDIR |= (_BV(CHB_SLPTR_PIN));
 
     // config radio
-    chb_radio_init();
+    return chb_radio_init();
 }
 
 /**************************************************************************/

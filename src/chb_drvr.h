@@ -250,7 +250,7 @@ enum
 */
 /**************************************************************************/
 // init 
-void chb_drvr_init();
+U8 chb_drvr_init();
 
 // data access
 U8 chb_reg_read(U8 addr);

@@ -49,11 +49,11 @@ static U16 prev_src_addr = 0xFFFE;
 
 */
 /**************************************************************************/
-void chb_init()
+U8 chb_init()
 {
     memset(&pcb, 0, sizeof(pcb_t));
     pcb.src_addr = chb_get_short_addr();
-    chb_drvr_init();
+    return chb_drvr_init();
 }
 
 /**************************************************************************/

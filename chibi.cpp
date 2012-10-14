@@ -64,9 +64,9 @@ static chb_rx_data_t rx_data;
     Init the chibi stack
 */
 /**************************************************************************/
-void chibiInit()
+uint8_t chibiInit()
 {
-    chb_init();
+    return chb_init();
 }
 
 /**************************************************************************/

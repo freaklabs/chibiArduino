@@ -92,7 +92,7 @@ typedef struct
     U8 *data;
 } chb_rx_data_t;
 
-void chb_init();
+U8 chb_init();
 pcb_t *chb_get_pcb();
 U8 chb_write(U16 addr, U8 *data, U8 len);
 U8 chb_read(chb_rx_data_t *rx);
