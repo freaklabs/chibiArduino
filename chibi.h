@@ -64,6 +64,7 @@ uint8_t chibiGetData(uint8_t *data);
 uint8_t chibiGetRSSI();
 uint16_t chibiGetSrcAddr();
 uint8_t chibiSetChannel(uint8_t channel);
+uint8_t chibiGetChannel();
 void chibiSleepRadio(uint8_t enb);
 void chibiCmdInit(uint32_t speed);
 void chibiCmdPoll();
