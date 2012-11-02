@@ -42,7 +42,7 @@
 #if ARDUINO >= 100
     #include "Arduino.h"
 #else
-    #include <WProgram.h>
+    #include "WProgram.h"
 #endif
 
 #if (CHB_RX_POLLING_MODE)
@@ -60,6 +60,7 @@
     const char chb_err_overflow[] PROGMEM = "BUFFER FULL. TOSSING INCOMING DATA\n";
     const char chb_err_init[] PROGMEM = "RADIO NOT INITIALIZED PROPERLY\n";
 #endif
+
 /**************************************************************************/
 /*!
     Retrieve the state from the radio's state machine register.
@@ -87,10 +88,7 @@ static U8 chb_get_status()
 /**************************************************************************/
 static void chb_delay_us(U16 usec)
 {
-    do
-    {
-        delayMicroseconds(usec);
-    } while (--usec);
+    delayMicroseconds(usec);
 }
 
 /**************************************************************************/
@@ -295,7 +293,6 @@ static void chb_frame_read()
         {
             // this frame will overflow the buffer. toss the data and do some housekeeping
             pcb_t *pcb = chb_get_pcb();
-            char buf[50];
 
             // read out the data and throw it away
             for (i=0; i<len; i++)
@@ -305,10 +302,6 @@ static void chb_frame_read()
 
             // Increment the overflow stat, and print a message.
             pcb->overflow++;
-
-            // grab the message from flash & print it out
-            strcpy_P(buf, chb_err_overflow);
-            Serial.print(buf);
         }
     }
 
@@ -581,11 +574,24 @@ U8 chb_tx(U8 *hdr, U8 *data, U8 len)
     chb_reg_read_mod_write(TRX_STATE, CMD_TX_START, 0x1F);
 
     // wait for the transmission to end, signalled by the TRX END flag
-    while (!pcb->tx_end);
+    while (!pcb->tx_end)
+    {
+        ;
+    }
     pcb->tx_end = false;
 
     // check the status of the transmission
     return chb_get_status();
+}
+
+/**************************************************************************/
+/*!
+    Return the part number of the radio
+*/
+/**************************************************************************/
+U8 chb_get_part_num()
+{
+    return chb_reg_read(PART_NUM);
 }
 
 /**************************************************************************/
@@ -596,6 +602,8 @@ U8 chb_tx(U8 *hdr, U8 *data, U8 len)
 static void chb_radio_init()
 {
     U8 ieee_addr[8];
+    U8 i, rnd, tmp, part_num;
+    U16 addr;
 
     // disable intps while we config the radio
     chb_reg_write(IRQ_MASK, 0);
@@ -606,31 +614,61 @@ static void chb_radio_init()
 
     // set radio cfg parameters
     // **note** uncomment if these will be set to something other than default
-    //chb_reg_read_mod_write(XAH_CTRL_0, CHB_MAX_FRAME_RETRIES << CHB_MAX_FRAME_RETRIES_POS, 0xF << CHB_MAX_FRAME_RETRIES_POS);
+    chb_reg_read_mod_write(XAH_CTRL_0, CHB_MAX_FRAME_RETRIES << CHB_MAX_FRAME_RETRIES_POS, 0xF << CHB_MAX_FRAME_RETRIES_POS);
     //chb_reg_read_mod_write(XAH_CTRL_0, CHB_MAX_CSMA_RETRIES << CHB_MAX_CSMA_RETIRES_POS, 0x7 << CHB_MAX_CSMA_RETIRES_POS);
     //chb_reg_read_mod_write(CSMA_SEED_1, CHB_MIN_BE << CHB_MIN_BE_POS, 0x3 << CHB_MIN_BE_POS);     
-    //chb_reg_read_mod_write(CSMA_SEED_1, CHB_CSMA_SEED1 << CHB_CSMA_SEED1_POS, 0x7 << CHB_CSMA_SEED1_POS);
-    //chb_ret_write(CSMA_SEED0, CHB_CSMA_SEED0);     
+    //chb_reg_read_mod_write(CSMA_SEED_1, CHB_CSMA_SEED1 << CHB_CSMA_SEED1_POS, 0x7 << CHB_CSMA_SEED1_POS);        
     //chb_reg_read_mod_write(PHY_CC_CCA, CHB_CCA_MODE << CHB_CCA_MODE_POS,0x3 << CHB_CCA_MODE_POS);
     //chb_reg_write(CCA_THRES, CHB_CCA_ED_THRES);
     //chb_reg_read_mod_write(PHY_TX_PWR, CHB_TX_PWR, 0xf);
 
 
-// TEST FOR AT86RF212
-    // set the mode
-    chb_set_mode(CHB_INIT_MODE);
-// END TEST 
+    // identify device
+    part_num = chb_reg_read(PART_NUM);
 
-    // set the channel
-    chb_set_channel(CHB_CHANNEL);
+    switch (part_num)
+    {
+    case CHB_AT86RF230:
+        // set default channel
+        chb_set_channel(CHB_2_4GHZ_DEFAULT_CHANNEL);
+        //Serial.println("AT86RF230 2.4 GHz radio detected.");
 
 #if (CHIBI_PROMISCUOUS == 0)
     // set autocrc mode
     chb_reg_read_mod_write(PHY_TX_PWR, 1 << CHB_AUTO_CRC_POS, 1 << CHB_AUTO_CRC_POS);
-
-    // for at86rf212
-    //chb_reg_read_mod_write(TRX_CTRL1, 1 << CHB_AUTO_CRC_POS, 1 << CHB_AUTO_CRC_POS);
 #endif
+        break;
+
+    case CHB_AT86RF231:
+        // set default channel
+        chb_set_channel(CHB_2_4GHZ_DEFAULT_CHANNEL);
+        //Serial.println("AT86RF231 2.4 GHz radio detected.");
+
+#if (CHIBI_PROMISCUOUS == 0)
+    // set autocrc mode
+    chb_reg_read_mod_write(PHY_TX_PWR, 1 << CHB_AUTO_CRC_POS, 1 << CHB_AUTO_CRC_POS);
+#endif
+        break;
+
+    case CHB_AT86RF212:
+        // set mode to OQPSK or BPSK depending on setting
+        chb_set_mode(CHB_INIT_MODE);
+
+        // set default channel and tx power to max
+        chb_set_channel(CHB_900MHZ_DEFAULT_CHANNEL);
+        chb_reg_read_mod_write(PHY_TX_PWR, CHB_900MHZ_TX_PWR, 0xf);
+        //Serial.println("AT86RF212 900 MHz radio detected.");
+
+#if (CHIBI_PROMISCUOUS == 0)
+    // set autocrc mode
+    chb_reg_read_mod_write(TRX_CTRL1, 1 << 5, 1 << 5);
+#endif
+        break;
+
+    default:
+        //Serial.println("ERROR: Unknown radio detected.");
+        break;
+    }
 
     // set transceiver's fsm state
     chb_set_state(RX_STATE);
@@ -664,6 +702,28 @@ static void chb_radio_init()
         // grab the error message from flash & print it out
         strcpy_P(buf, chb_err_init);
         Serial.print(buf);
+    }
+
+    // init the CSMA random seed value
+    if (part_num == CHB_AT86RF230)
+    {
+        // set a seed value for the CSMA backoffs
+        addr = chb_get_short_addr();
+        tmp = (U8)(addr & 0x00FF);
+        chb_reg_write(CSMA_SEED_0, tmp); 
+    }
+    else if ((part_num == CHB_AT86RF212) || (part_num == CHB_AT86RF231))
+    {
+        // use the random number generator for the CSMA seed value
+        tmp = 0;
+        for (i=0; i<4; i++)
+        {
+            tmp = chb_reg_read(PHY_RSSI);
+            tmp >>= 5;
+            tmp &= 0x03;
+            rnd |= tmp << (i*2);
+        }
+        chb_reg_write(CSMA_SEED_0, rnd);
     }
 }
 

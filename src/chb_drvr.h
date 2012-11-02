@@ -41,8 +41,6 @@
 
 #define CHB_CC1190_PRESENT      0       /// Set to 1 if CC1190 is being used
 #define CHB_CHINA               0       /// Support 780 MHz Chinese band        
-#define CHB_AT86RF212_VER_NUM   0x01    /// AT86RF212 version number            
-#define CHB_AT86RF212_PART_NUM  0x07    /// AT86RF212 part number               
 #define CHB_BPSK                0       /// BPSK modulation enable    
 
 #define CHB_SPI_CMD_RW      0xC0    /**<  Register Write (short mode). */
@@ -226,6 +224,14 @@ enum
     BPSK40_915MHZ   = 3
 };
 
+// part numbers for atmel radios
+enum
+{
+    CHB_AT86RF230   = 2,
+    CHB_AT86RF212   = 7,
+    CHB_AT86RF231   = 3
+};
+
 #if (CHB_BPSK == 1)
     #define CHB_INIT_MODE BPSK40_915MHZ
 #else
@@ -269,6 +275,7 @@ void chb_get_ieee_addr(U8 *addr);
 void chb_set_short_addr(U16 addr);
 U16 chb_get_short_addr();
 void chb_sleep(U8 enb);
+U8 chb_get_part_num();
 
 // data transmit
 U8 chb_tx(U8 *hdr, U8 *data, U8 len);

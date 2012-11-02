@@ -35,7 +35,7 @@
 #include "chb_buf.h"
 
 static U8 chb_buf[CHB_BUF_SZ];
-static U8 rd_ptr, wr_ptr, len;
+static U16 rd_ptr, wr_ptr, len;
 
 /**************************************************************************/
 /*!
@@ -69,10 +69,14 @@ void chb_buf_write(U8 data)
 U8 chb_buf_read()
 {
     U8 data;
-
     data = chb_buf[rd_ptr];
     rd_ptr = (rd_ptr + 1) % CHB_BUF_SZ;
+
+    // protect the len update. otherwise it could get corrupted if an intp occurs here
+    cli();
     len--;
+    sei();
+
     return data;
 }
 
@@ -81,7 +85,7 @@ U8 chb_buf_read()
 
 */
 /**************************************************************************/
-U8 chb_buf_get_len()
+U16 chb_buf_get_len()
 {
     return len;
 }

@@ -112,6 +112,7 @@ ISR(CHB_RADIO_IRQ)
                     pcb->tx_end = true;
                 }
                 intp_src &= ~CHB_IRQ_TRX_END_MASK;
+
                 while (chb_set_state(RX_STATE) != RADIO_SUCCESS);
             }
             else if (intp_src & CHB_IRQ_TRX_UR_MASK)
@@ -137,6 +138,5 @@ ISR(CHB_RADIO_IRQ)
             }
         }
     }
-
     CHB_LEAVE_CRIT();
 }

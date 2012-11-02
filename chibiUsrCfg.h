@@ -187,7 +187,8 @@
         Integer; Range: 11 - 26; Default: 11
 */
 /**************************************************************************/
-#define CHB_CHANNEL     11
+#define CHB_2_4GHZ_DEFAULT_CHANNEL     11
+#define CHB_900MHZ_DEFAULT_CHANNEL     1
 
 /**************************************************************************/
 /*!
@@ -204,22 +205,10 @@
 /*!
     This is the value that gets written into the radio's register. Each value
     corresponds to a different transmit power in dBm. The mapping is as follows:
- 
-        Value       Power (dBm)
-        0x0         +3.0    (Default)
-        0x1         +2.6
-        0x2         +2.1
-        0x3         +1.6
-        0x4         +1.1
-        0x5         +0.5
-        0x6         -0.2
-        0x7         -1.2
-        0x8         -2.2
-        0x9         -3.2
-        0xA         -4.2
 */
 /**************************************************************************/
-#define CHB_TX_PWR  0x0
+#define CHB_2_4GHZ_TX_PWR  0x0
+#define CHB_900MHZ_TX_PWR  0xE1
 
 /**************************************************************************/
 /*!
@@ -286,14 +275,5 @@
 /**************************************************************************/
 #define CHB_CCA_ED_THRES    0x7
 
-/**************************************************************************/
-/*!
-    These are the seeds to start off the pseudorandom number generator
-    for the backoff timer. They can be defined to be anything and will
-    determine the random number sequence for the backoffs. 
-*/
-/**************************************************************************/
-#define CHB_CSMA_SEED0  0
-#define CHB_CSMA_SEED1  0
 
 #endif

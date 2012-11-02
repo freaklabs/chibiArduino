@@ -53,6 +53,16 @@ void chb_init()
 {
     memset(&pcb, 0, sizeof(pcb_t));
     pcb.src_addr = chb_get_short_addr();
+
+    // if SPI slave select pin is input, enable internal pullup on it.
+    // otherwise it will constantly fall into spi slave mode and hang everything.
+    // if not input, leave it alone.
+    if (!(DDRB & (1<<DDB2)))
+    {
+        MCUCR &= ~(1<<PUD);
+        PORTB |= (1<<PORTB2);
+    }
+
     chb_drvr_init();
 }
 
