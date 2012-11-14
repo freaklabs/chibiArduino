@@ -126,6 +126,13 @@
 #define CHB_SLPTR_PORT       PORTA
 #define CHB_SLPTR_DDIR       DDRA
 #define CHB_SLPTR_PIN        2
+
+#elif defined(__AVR_ATmega32U4__)
+/* for new Ninja2 board using 32u4 PORTD5 */
+#define CHB_SLPTR_PORT      PORTD
+#define CHB_SLPTR_DDIR      DDRD
+#define CHB_SLPTR_PIN       5
+
 #else
 /* for standard freakduino */
 #define CHB_SLPTR_PORT       PORTC
@@ -149,6 +156,12 @@
 #define CHB_SPI_CS_DDIR DDRD
 #define CHB_SPI_CS_PIN  5                 // PD.5 - SPI Chip Select (SSEL)
 
+#elif defined(__AVR_ATmega32U4__)
+/* for bGeigie2 board using PORTD7 on 32u4 */
+#define CHB_SPI_CS_PORT PORTB
+#define CHB_SPI_CS_DDIR DDRB
+#define CHB_SPI_CS_PIN  0                 // PB.0 - SPI Chip Select (SSEL)
+
 #else
 /* for standard freakduino */
 #define CHB_SPI_CS_PORT PORTC
@@ -169,6 +182,10 @@
 /* for bGeigie2 board using 1284P (PC6) */
 #define CHB_RADIO_IRQ       PCINT2_vect
 
+#elif defined(__AVR_ATmega32U4__)
+/* for bGeigie2 board using 32U4 (PB7) */
+#define CHB_RADIO_IRQ       PCINT0_vect
+
 #else
 /* for standard freakduino (PB6) */
 #define CHB_RADIO_IRQ       PCINT0_vect
@@ -187,6 +204,15 @@
             {                           \
                 PCMSK2 |= _BV(PCINT22);  \
                 PCICR |= _BV(PCIE2);    \
+            }                           \ 
+            while(0)
+
+#elif defined(__AVR_ATmega32U4__)
+/* for bGeigie2 board using PCINT7 (PB7) on 32U4 */
+#define CFG_CHB_INTP() do               \
+            {                           \
+                PCMSK0 |= _BV(PCINT7);  \
+                PCICR |= _BV(PCIE0);    \
             }                           \ 
             while(0)
 
@@ -210,8 +236,18 @@
     off until the SPI bus is free and the data can be retrieved without collision.
 */
 /**************************************************************************/
+#if defined(__AVR_ATmega1284P__)
+#define CHB_IRQ_DISABLE() do {PCMSK2 &= ~_BV(PCINT22);} while(0)
+#define CHB_IRQ_ENABLE() do {PCMSK2 |= _BV(PCINT22);} while(0)
+
+#elif defined(__AVR_ATmega32U4__)
+#define CHB_IRQ_DISABLE() do {PCMSK0 &= ~_BV(PCINT7);} while(0)
+#define CHB_IRQ_ENABLE() do {PCMSK0 |= _BV(PCINT7);} while(0)
+
+#else
 #define CHB_IRQ_DISABLE() do {PCMSK0 &= ~_BV(PCINT6);} while(0)
 #define CHB_IRQ_ENABLE() do {PCMSK0 |= _BV(PCINT6);} while(0)
+#endif
 
 
 /**************************************************************************/

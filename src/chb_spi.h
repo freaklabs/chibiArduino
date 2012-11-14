@@ -58,6 +58,15 @@
 #define CHB_MISO        6                 // PB.6 - Input:  SPI Master in - slave out (MISO)
 #define CHB_SPI_SELN    4                 // PB.4 - Input: The dedicated SPI CS pin needs to have internal pullup enabled if an input
 
+#elif defined(__AVR_ATmega32U4__)
+/* for bGeigie2 board using 1284P */
+#define CHB_SPI_PORT    PORTB
+#define CHB_SPI_DDIR    DDRB
+#define CHB_SCK         1                 // PB.1 - Output: SPI Serial Clock (SCLK)
+#define CHB_MOSI        2                 // PB.2 - Output: SPI Master out - slave in (MOSI)
+#define CHB_MISO        3                 // PB.3 - Input:  SPI Master in - slave out (MISO)
+#define CHB_SPI_SELN    0                 // PB.0 - Input: The dedicated SPI CS pin needs to have internal pullup enabled if an input
+
 #else
 /* for standard freakduino */
 #define CHB_SPI_PORT    PORTB

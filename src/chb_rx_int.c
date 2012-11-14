@@ -66,6 +66,9 @@ ISR(CHB_RADIO_IRQ)
 #if defined(__AVR_ATmega1284P__)
     /* for bGeigie2 board using 1284P (PC6) */
     pinval = PINC & _BV(PINC6);
+#elif defined(__AVR_ATmega32U4__)
+    /* for bGeigie2 board using 32U4 (PB7) */
+    pinval = PINB & _BV(PINB7);
 #else
     /* for standard freakduino (PB6) */
     pinval = PINB & _BV(PINB6);
