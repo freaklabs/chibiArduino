@@ -85,10 +85,8 @@ static U8 chb_get_status()
 /**************************************************************************/
 static void chb_delay_us(U16 usec)
 {
-    do
-    {
-        delayMicroseconds(usec);
-    } while (--usec);
+    // Use the Arduino microsecond delay function
+    delayMicroseconds(usec);
 }
 
 /**************************************************************************/
