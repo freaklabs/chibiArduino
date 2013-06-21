@@ -183,6 +183,10 @@ U8 chb_read(chb_rx_data_t *rx)
     {
         return 0;
     }
+
+// TEST
+//    printf("%d, %d\n", len, chb_buf_get_len());
+
     *data_ptr++ = len;
 
     // load the rest of the data into buffer

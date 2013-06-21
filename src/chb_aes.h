@@ -1,5 +1,5 @@
 /*******************************************************************
-    Copyright (C) 2009 FreakLabs
+    Copyright (C) 2013 FreakLabs
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -31,54 +31,44 @@
     Please post support questions to the FreakLabs forum.
 
 *******************************************************************/
-/*!
-    \file 
-    \ingroup
+#pragma once
 
+#define AES_BLOCKSIZE   16
+#define AES_KEYSIZE     16
+#define AES_ENCRYPT     0
+#define AES_DECRYPT     1
+#define AES_ECB         0
+#define AES_KEY         1
+#define AES_CBC         2
+#define AES_NO_REQ      0
+#define AES_START_REQ   1
 
-*/
-/**************************************************************************/
-#ifndef CHIBI_H
-#define CHIBI_H
+#define AES_BASE_ADDR       0x80
+#define AES_STATUS          0x82
+#define AES_CTRL            0x83
+#define AES_STATE_KEY_0     0x84
 
-// For handling Arduino 1.0 compatibility and backwards compatibility
-#if ARDUINO >= 100
-    #include "Arduino.h"
-#else
-    #include "WProgram.h"
-#endif
+typedef struct 
+{
+    bool init;
+    uint8_t curr_dir;
+    uint8_t cfg;
+    uint8_t cfg_mirr;
+    uint8_t enc_key[AES_KEYSIZE];
+    uint8_t dec_key[AES_KEYSIZE];
+} aes_t;
 
-#include "chibiUsrCfg.h"
+void chb_aes_init(uint8_t *key);
+void chb_aes_ctrl_set(uint8_t dir, uint8_t mode, uint8_t request);
+uint8_t chb_aes_encrypt(uint8_t mode, uint8_t len, uint8_t *plaintext, uint8_t *ciphertext);
+uint8_t chb_aes_decrypt(uint8_t mode, uint8_t len, uint8_t *plaintext, uint8_t *ciphertext);
+void chb_aes_wrrd(uint8_t *rdata, uint8_t *wdata);
+void chb_aes_write(uint8_t *wdata);
+void chb_aes_read(uint8_t *rdata);
+void chb_sram_write(uint8_t addr, uint8_t len, uint8_t *wdata);
+void chb_sram_read(uint8_t addr, uint8_t len, uint8_t *rdata);
+bool chb_aes_err_chk(uint8_t mode, uint8_t len);
+void chb_aes_write_key(uint8_t *key);
 
-#define BROADCAST_ADDR 0xFFFF
+void chb_aes_test(uint8_t *key);
 
-void chibiInit();
-void chibiSetShortAddr(uint16_t addr);
-uint16_t chibiGetShortAddr();
-void chibiSetIEEEAddr(uint8_t *ieee_addr);
-void chibiGetIEEEAddr(uint8_t *ieee_addr);
-uint8_t chibiRegRead(uint8_t addr);
-void chibiRegWrite(uint8_t addr, uint8_t val);
-uint8_t chibiTx(uint16_t addr, uint8_t *data, uint8_t len);
-uint8_t chibiDataRcvd();
-uint8_t chibiGetData(uint8_t *data);
-uint8_t chibiGetRSSI();
-uint16_t chibiGetSrcAddr();
-uint8_t chibiSetChannel(uint8_t channel);
-uint8_t chibiGetPartID();
-void chibiSleepRadio(uint8_t enb);
-void chibiCmdInit(uint32_t speed);
-void chibiCmdPoll();
-void chibiCmdAdd(char *name, void (*func)(int argc, char **argv));
-uint32_t chibiCmdStr2Num(char *str, uint8_t base);
-
-void chibiAesInit(uint8_t *key);
-uint8_t chibiAesEncrypt(uint8_t len, uint8_t *plaintext, uint8_t *ciphertext);
-uint8_t chibiAesDecrypt(uint8_t len, uint8_t *plaintext, uint8_t *ciphertext);
-void chibiSetDataRate(uint8_t rate);
-uint8_t chibiGetRand();
-void chibiSetMode(uint8_t mode);
-
-void chibiAesTest(uint8_t *key);
-
-#endif

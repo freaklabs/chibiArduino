@@ -65,7 +65,11 @@ ISR(CHB_RADIO_IRQ)
     CHB_ENTER_CRIT();
 
     // get the pin's value to check whether it was a rising or falling edge.
-    pinval = PINB & _BV(PINB6);
+#if (USE_PINCHANGE_INTP == 1)
+    pinval = CHB_INTP_PORT & _BV(CHB_INTP_PIN);
+#else
+    pinval = 1;
+#endif
 
     // we'll only enter the ISR if the interrupt is a positive edge.  
     if (pinval)

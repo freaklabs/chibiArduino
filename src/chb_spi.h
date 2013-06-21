@@ -48,14 +48,22 @@
 #define CHB_SPI_ENABLE()    do {CHB_SPI_CS_PORT &= ~(_BV(CHB_SPI_CS_PIN));} while (0)
 #define CHB_SPI_DISABLE()   do {CHB_SPI_CS_PORT |= _BV(CHB_SPI_CS_PIN);} while (0)
 
-/* Note: The SPI chip select pin is defined in chibiUsrCfg.h */
-#define CHB_SPI_PORT    PORTB
-#define CHB_SPI_DDIR    DDRB
-#define CHB_SCK         5                 // PB.5 - Output: SPI Serial Clock (SCLK)
-#define CHB_MOSI        3                 // PB.3 - Output: SPI Master out - slave in (MOSI)
-#define CHB_MISO        4                 // PB.4 - Input:  SPI Master in - slave out (MISO)
-#define CHB_SPI_SELN    2                 // PB.2 - Input: The dedicated SPI CS pin needs to have internal pullup enabled if an input
-
+#if defined(__AVR_ATmega1284P__)
+    #define CHB_SPI_PORT    PORTB
+    #define CHB_SPI_DDIR    DDRB
+    #define CHB_SCK         7                 // PB.5 - Output: SPI Serial Clock (SCLK)
+    #define CHB_MOSI        5                 // PB.3 - Output: SPI Master out - slave in (MOSI)
+    #define CHB_MISO        6                 // PB.4 - Input:  SPI Master in - slave out (MISO)
+    #define CHB_SPI_SELN    4                 // PB.2 - Input: The dedicated SPI CS pin needs to have internal pullup enabled if an input
+#else
+    /* Note: The SPI chip select pin is defined in chibiUsrCfg.h */
+    #define CHB_SPI_PORT    PORTB
+    #define CHB_SPI_DDIR    DDRB
+    #define CHB_SCK         5                 // PB.5 - Output: SPI Serial Clock (SCLK)
+    #define CHB_MOSI        3                 // PB.3 - Output: SPI Master out - slave in (MOSI)
+    #define CHB_MISO        4                 // PB.4 - Input:  SPI Master in - slave out (MISO)
+    #define CHB_SPI_SELN    2                 // PB.2 - Input: The dedicated SPI CS pin needs to have internal pullup enabled if an input
+#endif
 void chb_spi_init();
 U8 chb_xfer_byte(U8 data);
 

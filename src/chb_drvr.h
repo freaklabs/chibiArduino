@@ -41,7 +41,6 @@
 
 #define CHB_CC1190_PRESENT      0       /// Set to 1 if CC1190 is being used
 #define CHB_CHINA               0       /// Support 780 MHz Chinese band        
-#define CHB_BPSK                0       /// BPSK modulation enable    
 
 #define CHB_SPI_CMD_RW      0xC0    /**<  Register Write (short mode). */
 #define CHB_SPI_CMD_RR      0x80    /**<  Register Read (short mode). */
@@ -218,10 +217,10 @@ enum
 // transceiver modes for AT86RF212
 enum
 {
-    OQPSK_868MHZ    = 0,
-    OQPSK_915MHZ    = 1,
-    OQPSK_780MHZ    = 2,
-    BPSK40_915MHZ   = 3
+    OQPSK_SINRC = 0,
+    OQPSK_SIN   = 1,
+    OQPSK_RC    = 2,
+    BPSK_40     = 3
 };
 
 // part numbers for atmel radios
@@ -232,11 +231,14 @@ enum
     CHB_AT86RF231   = 3
 };
 
-#if (CHB_BPSK == 1)
-    #define CHB_INIT_MODE BPSK40_915MHZ
-#else
-    #define CHB_INIT_MODE OQPSK_915MHZ    
-#endif
+// Data rate enums
+enum
+{
+    CHB_RATE_250KBPS =  0,
+    CHB_RATE_500KBPS =  1,
+    CHB_RATE_1000KBPS = 2,
+    CHB_RATE_2000KBPS = 3
+};
 
 /**************************************************************************/
 /*!
@@ -276,15 +278,11 @@ void chb_set_short_addr(U16 addr);
 U16 chb_get_short_addr();
 void chb_sleep(U8 enb);
 U8 chb_get_part_num();
+U8 chb_set_datarate(U8 rate);
+U8 chb_get_rand();
+void chb_set_mode();
 
 // data transmit
 U8 chb_tx(U8 *hdr, U8 *data, U8 len);
 
-#ifdef CHB_DEBUG
-// sram access
-void chb_sram_read(U8 addr, U8 len, U8 *data);
-void chb_sram_write(U8 addr, U8 len, U8 *data);
 #endif
-
-#endif
-

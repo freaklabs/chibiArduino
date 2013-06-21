@@ -1,0 +1,37 @@
+# See: http://code.google.com/p/arduino/wiki/Platforms
+
+##############################################################
+
+freakduino-v21.name = Freakduino Standard, 5.0V, 8MHz, w/ATMega328P
+freakduino-v21.upload.protocol=arduino
+freakduino-v21.upload.maximum_size=28672
+freakduino-v21.upload.speed=57600
+freakduino-v21.bootloader.low_fuses=0xFF
+freakduino-v21.bootloader.high_fuses=0xDA
+freakduino-v21.bootloader.extended_fuses=0x05
+freakduino-v21.bootloader.path=atmega
+freakduino-v21.bootloader.file=ATmegaBOOT_168_atmega328_pro_8MHz.hex
+freakduino-v21.bootloader.unlock_bits=0x3F
+freakduino-v21.bootloader.lock_bits=0x0F
+freakduino-v21.build.mcu=atmega328p
+freakduino-v21.build.f_cpu=8000000L
+freakduino-v21.build.core=arduino
+freakduino-v21.build.variant=freakduino-v21
+
+##############################################################
+
+freakduino-lr-v21.name = Freakduino Long Range, 5.0V, 8MHz, w/ATMega328P
+freakduino-lr-v21.upload.protocol=arduino
+freakduino-lr-v21.upload.maximum_size=28672
+freakduino-lr-v21.upload.speed=57600
+freakduino-lr-v21.bootloader.low_fuses=0xFF
+freakduino-lr-v21.bootloader.high_fuses=0xDA
+freakduino-lr-v21.bootloader.extended_fuses=0x05
+freakduino-lr-v21.bootloader.path=atmega
+freakduino-lr-v21.bootloader.file=ATmegaBOOT_168_atmega328_pro_8MHz.hex
+freakduino-lr-v21.bootloader.unlock_bits=0x3F
+freakduino-lr-v21.bootloader.lock_bits=0x0F
+freakduino-lr-v21.build.mcu=atmega328p
+freakduino-lr-v21.build.f_cpu=8000000L
+freakduino-lr-v21.build.core=arduino
+freakduino-lr-v21.build.variant=freakduino-lr-v21

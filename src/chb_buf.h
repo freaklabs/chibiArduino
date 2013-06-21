@@ -40,12 +40,12 @@
 #if (CHIBI_PROMISCUOUS)
     // if we're using promiscuous mode, we may end up capturing a lot of frames.
     // crank up the buffer size to handle traffic spikes.
-    #define CHB_BUF_SZ 1023
+    #define CHB_BUF_SZ 768
 #else
     // in normal mode, this is the buffer size to handle incoming frames. if there
     // is a lot of traffic and you're getting buffer issues, then increase this 
     // value so that more frames can be held inside RAM
-    #define CHB_BUF_SZ 255
+    #define CHB_BUF_SZ 256
 #endif
 
 void chb_buf_init();
