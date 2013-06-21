@@ -72,4 +72,13 @@ void chibiCmdPoll();
 void chibiCmdAdd(char *name, void (*func)(int argc, char **argv));
 uint32_t chibiCmdStr2Num(char *str, uint8_t base);
 
+void chibiAesInit(uint8_t *key);
+uint8_t chibiAesEncrypt(uint8_t len, uint8_t *plaintext, uint8_t *ciphertext);
+uint8_t chibiAesDecrypt(uint8_t len, uint8_t *plaintext, uint8_t *ciphertext);
+void chibiSetDataRate(uint8_t rate);
+uint8_t chibiGetRand();
+void chibiSetMode(uint8_t mode);
+
+void chibiAesTest(uint8_t *key);
+
 #endif

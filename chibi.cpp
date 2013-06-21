@@ -38,6 +38,7 @@
 
 */
 /**************************************************************************/
+#include <avr/pgmspace.h>
 #include "chibi.h"
 
 // Including the actual "c" files rather than the headers. The Arduino lib only
@@ -49,6 +50,7 @@
 #include "src/chb_spi.c"
 #include "src/chb_eeprom.c"
 #include "src/chb_cmd.c"
+#include "src/chb_aes.c"
 
 #if (CHB_RX_POLLING_MODE)
    #include "src/chb_rx_poll.c"
@@ -287,3 +289,85 @@ uint32_t chibiCmdStr2Num(char *str, uint8_t base)
     return chb_cmd_str2num(str, base);
 }
 
+/**************************************************************************/
+/*!
+
+*/
+/**************************************************************************/
+void chibiAesInit(uint8_t *key)
+{
+    chb_aes_init(key);
+}
+
+/**************************************************************************/
+/*!
+
+*/
+/**************************************************************************/
+uint8_t chibiAesEncrypt(uint8_t len, uint8_t *plaintext, uint8_t *ciphertext)
+{
+    return chb_aes_encrypt(AES_ECB, len, plaintext, ciphertext);
+}
+
+/**************************************************************************/
+/*!
+
+*/
+/**************************************************************************/
+uint8_t chibiAesDecrypt(uint8_t len, uint8_t *plaintext, uint8_t *ciphertext)
+{
+    return chb_aes_decrypt(AES_ECB, len, plaintext, ciphertext);
+}
+
+/**************************************************************************/
+/*!
+    Set the data rate of the IC. Here are the values to use:
+
+    AT86RF230: not supported
+    AT86RF231, all channels: 0              = 250 kbps
+    AT86RF231, all channels: 1              = 500 kbps
+    AT86RF231, all channels: 2              = 1000 kbps
+    AT86RF231, all channels: 3              = 2000 kbps
+    AT86RF212, channel 0 (868 MHz) : 0      = 100 kbps    
+    AT86RF212, channel 0 (868 MHz) : 1      = 200 kbps    
+    AT86RF212, channel 0 (868 MHz) : 2      = 400 kbps
+    AT86RF212, channel 1-10(916 MHz) : 0    = 250 kbps    
+    AT86RF212, channel 1-10(916 MHz) : 1    = 500 kbps    
+    AT86RF212, channel 1-10(916 MHz) : 2    = 1000 kbps    
+*/
+/**************************************************************************/
+void chibiSetDataRate(uint8_t rate)
+{
+    chb_set_datarate(rate);
+}
+
+/**************************************************************************/
+/*!
+    Get a true random value from the radio. Only supported by the AT86RF231
+    and the AT86RF212.
+*/
+/**************************************************************************/
+uint8_t chibiGetRand()
+{
+    return chb_get_rand();
+}
+
+/**************************************************************************/
+/*!
+    
+*/
+/**************************************************************************/
+void chibiSetMode(uint8_t mode)
+{
+    chb_set_mode(mode);
+}
+
+/**************************************************************************/
+/*!
+    
+*/
+/**************************************************************************/
+void chibiAesTest(uint8_t *key)
+{
+    chb_aes_test(key);
+}

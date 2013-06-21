@@ -55,11 +55,16 @@
 #if (CHIBI_PROMISCUOUS)
     const char chb_err_overflow[] PROGMEM = "";
     const char chb_err_init[] PROGMEM = "";
+    const char chb_err_not_supported[] PROGMEM = "";
 #else
     // store string messages in flash rather than RAM
     const char chb_err_overflow[] PROGMEM = "BUFFER FULL. TOSSING INCOMING DATA\n";
     const char chb_err_init[] PROGMEM = "RADIO NOT INITIALIZED PROPERLY\n";
+    const char chb_err_not_supported[] PROGMEM = "FEATURE NOT SUPPORTED";
 #endif
+
+// this holds the id of the radio to identify the chip type
+static U8 radio_id = 0;
 
 /**************************************************************************/
 /*!
@@ -145,8 +150,6 @@ U16 chb_reg_read16(U8 addr)
 /**************************************************************************/
 void chb_reg_write(U8 addr, U8 val)
 {
-    U8 dummy; 
-
     /* Add the Register Write command to the address. */
     addr |= 0xC0;
 
@@ -154,8 +157,8 @@ void chb_reg_write(U8 addr, U8 val)
     CHB_SPI_ENABLE();
 
     /*Send Register address and write register content.*/
-    dummy = chb_xfer_byte(addr);
-    dummy = chb_xfer_byte(val);
+    chb_xfer_byte(addr);
+    chb_xfer_byte(val);
 
     CHB_SPI_DISABLE();
     CHB_LEAVE_CRIT();
@@ -225,7 +228,7 @@ void chb_reg_read_mod_write(U8 addr, U8 val, U8 mask)
 /**************************************************************************/
 void chb_frame_write(U8 *hdr, U8 hdr_len, U8 *data, U8 data_len)
 {
-    U8 i, dummy;
+    U8 i;
 
     // dont allow transmission longer than max frame size
     if ((hdr_len + data_len) > 127)
@@ -238,18 +241,18 @@ void chb_frame_write(U8 *hdr, U8 hdr_len, U8 *data, U8 data_len)
     CHB_SPI_ENABLE(); 
 
     // send fifo write command
-    dummy = chb_xfer_byte(CHB_SPI_CMD_FW);
+    chb_xfer_byte(CHB_SPI_CMD_FW);
 
     // write hdr contents to fifo
     for (i=0; i<hdr_len; i++)
     {
-        dummy = chb_xfer_byte(*hdr++);
+        chb_xfer_byte(*hdr++);
     }
 
     // write data contents to fifo
     for (i=0; i<data_len; i++)
     {
-        dummy = chb_xfer_byte(*data++);
+        chb_xfer_byte(*data++);
     }
 
     // terminate spi transaction
@@ -297,7 +300,7 @@ static void chb_frame_read()
             // read out the data and throw it away
             for (i=0; i<len; i++)
             {
-                data = chb_xfer_byte(0);
+                chb_xfer_byte(0);
             }
 
             // Increment the overflow stat, and print a message.
@@ -311,60 +314,39 @@ static void chb_frame_read()
 
 /**************************************************************************/
 /*!
-    Read directly from the SRAM on the radio. This is only used for debugging
-    purposes.
+    Get a random number from the on-board physical random number generator 
+    from the radio 
 */
 /**************************************************************************/
-#ifdef CHB_DEBUG
-void chb_sram_read(U8 addr, U8 len, U8 *data)
+U8 chb_get_rand()
 {
-    U8 i, dummy;
-
-    CHB_ENTER_CRIT();
-    CHB_SPI_ENABLE();
-
-    /*Send SRAM read command.*/
-    dummy = chb_xfer_byte(CHB_SPI_CMD_SR);
-
-    /*Send address where to start reading.*/
-    dummy = chb_xfer_byte(addr);
-
-    for (i=0; i<len; i++)
+    if (radio_id == CHB_AT86RF230)
     {
-        *data++ = chb_xfer_byte(0);
+        // part ID AT86RF230 does not support true random number generation
+        char buf[50];
+        
+        // nothing to be done here. print warning & return.
+        strcpy_P(buf, chb_err_not_supported);
+        Serial.print(buf);
+        return 0;
     }
+    else if ((radio_id == CHB_AT86RF212) || (radio_id == CHB_AT86RF231))
+    {
+        U8 i, rnd, tmp;
 
-    CHB_SPI_DISABLE();
-    CHB_LEAVE_CRIT();
+        rnd = tmp = 0;
+        for (i=0; i<4; i++)
+        {
+            tmp = chb_reg_read(PHY_RSSI);
+            tmp >>= 5;
+            tmp &= 0x03;
+            rnd |= tmp << (i*2);
+            chb_delay_us(5);
+        }
+        return rnd;
+    }
 }
 
-/**************************************************************************/
-/*!
-    Write to the SRAM of the radio. This is only used for debug purposes.
-*/
-/**************************************************************************/
-void chb_sram_write(U8 addr, U8 len, U8 *data)
-{    
-    U8 i, dummy;
-
-    CHB_ENTER_CRIT();
-    CHB_SPI_ENABLE();
-
-    /*Send SRAM write command.*/
-    dummy = chb_xfer_byte(CHB_SPI_CMD_SW);
-
-    /*Send address where to start writing to.*/
-    dummy = chb_xfer_byte(addr);
-
-    for (i=0; i<len; i++)
-    {
-        dummy = chb_xfer_byte(*data++);
-    }
-
-    CHB_SPI_DISABLE();
-    CHB_LEAVE_CRIT();
-}
-#endif
 
 /**************************************************************************/
 /*!
@@ -376,20 +358,20 @@ void chb_set_mode(U8 mode)
 {
     switch (mode)
     {
-    case OQPSK_868MHZ:
-        chb_reg_read_mod_write(TRX_CTRL_2, 0x08, 0x3f);                 // 802.15.4-2006, channel page 2, channel 0 (868 MHz, Europe)
+    case OQPSK_SINRC:
+        chb_reg_read_mod_write(TRX_CTRL_2, 0x28, 0x3f);                 // 802.15.4-2006, channel page 2, channel 0 (868 MHz, Europe)
         chb_reg_read_mod_write(RF_CTRL_0, CHB_OQPSK_TX_OFFSET, 0x3);    // this is according to table 7-16 in at86rf212 datasheet
         break;
-    case OQPSK_915MHZ:
-        chb_reg_read_mod_write(TRX_CTRL_2, 0x0c, 0x3f);                 // 802.15.4-2006, channel page 2, channels 1-10 (915 MHz, US)
+    case OQPSK_SIN:
+        chb_reg_read_mod_write(TRX_CTRL_2, 0x2c, 0x3f);                 // 802.15.4-2006, channel page 2, channels 1-10 (915 MHz, US)
         chb_reg_read_mod_write(RF_CTRL_0, CHB_OQPSK_TX_OFFSET, 0x3);    // this is according to table 7-16 in at86rf212 datasheet
         break;
-    case OQPSK_780MHZ:
-        chb_reg_read_mod_write(TRX_CTRL_2, 0x1c, 0x3f);                 // 802.15.4-2006, channel page 5, channel 0-3 (780 MHz, China)
+    case OQPSK_RC:
+        chb_reg_read_mod_write(TRX_CTRL_2, 0x3c, 0x3f);                 // 802.15.4-2006, channel page 5, channel 0-3 (780 MHz, China)
         chb_reg_read_mod_write(RF_CTRL_0, CHB_OQPSK_TX_OFFSET, 0x3);    // this is according to table 7-16 in at86rf212 datasheet
         break;
-    case BPSK40_915MHZ:
-        chb_reg_read_mod_write(TRX_CTRL_2, 0x00, 0x3f);                 // 802.15.4-2006, BPSK, 40 kbps
+    case BPSK_40:
+        chb_reg_read_mod_write(TRX_CTRL_2, 0x20, 0x3f);                 // 802.15.4-2006, BPSK, 40 kbps
         chb_reg_read_mod_write(RF_CTRL_0, CHB_BPSK_TX_OFFSET, 0x3);     // this is according to table 7-16 in at86rf212 datasheet
         break;
     }
@@ -526,6 +508,16 @@ U8 chb_set_channel(U8 channel)
     
     chb_reg_read_mod_write(PHY_CC_CCA, channel, 0x1f); 
 
+    // check to see if we're running in 868 band
+    if (radio_id == CHB_AT86RF212)
+    {
+        // if we're using the 868 MHz band, we should be running at 100 kbps 
+        // according to 802.15.4 spec. set SUB_MODE to 0.
+        U8 sub_mode;
+        sub_mode = (channel == 0) ? 0 : 1;
+        chb_reg_read_mod_write(TRX_CTRL_2, sub_mode << 2, 0x04);
+    }
+
     // add a delay to allow the PLL to lock if in active mode.
     state = chb_get_state();
     if ((state == RX_ON) || (state == PLL_ON))
@@ -544,6 +536,60 @@ U8 chb_set_channel(U8 channel)
 U8 chb_get_channel()
 {
     return (chb_reg_read(PHY_CC_CCA) & 0x1f);
+}
+
+/**************************************************************************/
+/*!
+    Change the default data rate of the radio
+*/
+/**************************************************************************/
+U8 chb_set_datarate(U8 rate)
+{
+    U8 std_ack;
+
+    // first check if the device is supported
+    switch (radio_id)
+    {
+        case CHB_AT86RF230:
+            char buf[50];
+
+            // nothing to be done here. print warning & return.
+            strcpy_P(buf, chb_err_not_supported);
+            Serial.print(buf);
+        return 0;
+
+        case CHB_AT86RF231:
+            // if we're in standards compliance mode, then use standard
+            // ack turnaround time. if we're using a high speed mode, then
+            // we need to speed up the ack turnaround.
+            std_ack = (rate == 0) ? 0x00 : 0x04;
+
+            // set the rate and set the ACK behavior for the data rate
+            chb_reg_read_mod_write(TRX_CTRL_2, rate, 0x03);
+            chb_reg_read_mod_write(XAH_CTRL_1, std_ack, 0x04);
+        break;
+
+        case CHB_AT86RF212:
+            if (rate != 0)
+            {
+                // change to OQPSK mode if we're in a proprietary mode                 
+                chb_reg_read_mod_write(TRX_CTRL_2, 0x08, 0x08);
+            }
+
+            // if we're in standards compliance mode, then use standard
+            // ack turnaround time. if we're using a high speed mode, then
+            // we need to speed up the ack turnaround.
+            std_ack = (rate == 0) ? 0x00 : 0x04;
+
+            // set the rate and set the ACK behavior for the data rate
+            chb_reg_read_mod_write(TRX_CTRL_2, rate, 0x03);
+            chb_reg_read_mod_write(XAH_CTRL_1, std_ack, 0x04);
+        break;
+
+        default:
+        break;
+    }
+    return 1;
 }
 
 /**************************************************************************/
@@ -602,7 +648,7 @@ U8 chb_get_part_num()
 static void chb_radio_init()
 {
     U8 ieee_addr[8];
-    U8 i, rnd, tmp, part_num;
+    U8 rnd, tmp;
     U16 addr;
 
     // disable intps while we config the radio
@@ -615,7 +661,7 @@ static void chb_radio_init()
     // set radio cfg parameters
     // **note** uncomment if these will be set to something other than default
     chb_reg_read_mod_write(XAH_CTRL_0, CHB_MAX_FRAME_RETRIES << CHB_MAX_FRAME_RETRIES_POS, 0xF << CHB_MAX_FRAME_RETRIES_POS);
-    //chb_reg_read_mod_write(XAH_CTRL_0, CHB_MAX_CSMA_RETRIES << CHB_MAX_CSMA_RETIRES_POS, 0x7 << CHB_MAX_CSMA_RETIRES_POS);
+    //chb_reg_read_mod_write(XAH_CTRL_0, CHB_MAX_CSMA_RETRIES << CHB_MAX_CSMA_RETRIES_POS, 0x7 << CHB_MAX_CSMA_RETIRES_POS);
     //chb_reg_read_mod_write(CSMA_SEED_1, CHB_MIN_BE << CHB_MIN_BE_POS, 0x3 << CHB_MIN_BE_POS);     
     //chb_reg_read_mod_write(CSMA_SEED_1, CHB_CSMA_SEED1 << CHB_CSMA_SEED1_POS, 0x7 << CHB_CSMA_SEED1_POS);        
     //chb_reg_read_mod_write(PHY_CC_CCA, CHB_CCA_MODE << CHB_CCA_MODE_POS,0x3 << CHB_CCA_MODE_POS);
@@ -624,9 +670,9 @@ static void chb_radio_init()
 
 
     // identify device
-    part_num = chb_reg_read(PART_NUM);
+    radio_id = chb_get_part_num();
 
-    switch (part_num)
+    switch (radio_id)
     {
     case CHB_AT86RF230:
         // set default channel
@@ -658,6 +704,11 @@ static void chb_radio_init()
         chb_set_channel(CHB_900MHZ_DEFAULT_CHANNEL);
         chb_reg_read_mod_write(PHY_TX_PWR, CHB_900MHZ_TX_PWR, 0xf);
         //Serial.println("AT86RF212 900 MHz radio detected.");
+
+        // set crystal trim to improve signal reception
+        // found that a value of 4 works well across all channels &
+        // all data rates.
+        chb_reg_read_mod_write(XOSC_CTRL, 0x04, 0x0F);
 
 #if (CHIBI_PROMISCUOUS == 0)
     // set autocrc mode
@@ -705,26 +756,18 @@ static void chb_radio_init()
     }
 
     // init the CSMA random seed value
-    if (part_num == CHB_AT86RF230)
+    if (radio_id == CHB_AT86RF230)
     {
         // set a seed value for the CSMA backoffs
         addr = chb_get_short_addr();
         tmp = (U8)(addr & 0x00FF);
         chb_reg_write(CSMA_SEED_0, tmp); 
     }
-    else if ((part_num == CHB_AT86RF212) || (part_num == CHB_AT86RF231))
+    else
     {
-        // use the random number generator for the CSMA seed value
-        tmp = 0;
-        for (i=0; i<4; i++)
-        {
-            tmp = chb_reg_read(PHY_RSSI);
-            tmp >>= 5;
-            tmp &= 0x03;
-            rnd |= tmp << (i*2);
-        }
+        rnd = chb_get_rand();
         chb_reg_write(CSMA_SEED_0, rnd);
-    }
+    } 
 }
 
 /**************************************************************************/
@@ -739,6 +782,7 @@ void chb_drvr_init()
 
     // configure IOs
     CHB_SLPTR_DDIR |= (_BV(CHB_SLPTR_PIN));
+    CHB_SLPTR_DISABLE();
 
     // config radio
     chb_radio_init();
@@ -760,7 +804,9 @@ void chb_sleep(U8 enb)
         // pullup on that pin. we do this so that we won't need to go through
         // a voltage divider which drains current. we want to avoid that when
         // we sleep
+        CHB_SLPTR_PORT |= _BV(CHB_SLPTR_PIN);
         CHB_SLPTR_DDIR &= ~(_BV(CHB_SLPTR_PIN));
+        CHB_SLPTR_PORT |= _BV(CHB_SLPTR_PIN);
     }
     else
     {

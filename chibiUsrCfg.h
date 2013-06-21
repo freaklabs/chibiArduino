@@ -45,6 +45,56 @@
 
 /**************************************************************************/
 /*!
+    Specify the board type
+*/
+/**************************************************************************/
+
+// Freakduino Series Boards
+#if (FREAKDUINO_V21 == 1)
+    #warning "ChibiArduino Notification: Freakduino Starndard, 5.0V, 8 MHz, ATMega328P board selected"
+    #define USE_PINCHANGE_INTP  1
+    #define CHB_INTP_PORT       PINB
+    #define CHB_INTP_PIN        6
+// Freakduino Long Range Series Boards
+#elif (FREAKDUINO_LONG_RANGE_V21 == 1)
+    #warning "ChibiArduino Notification: Freakduino Long Range, 5.0V, 8 MHz, ATMega328P board selected"
+    #define USE_PINCHANGE_INTP  1
+    #define CHB_INTP_PORT       PINB
+    #define CHB_INTP_PIN        6
+// Illuminado Receiver Boards
+#elif (ILLUMINADO_RX_V12 == 1)
+    #warning "ChibiArduino Notification: Illuminado Receiver, 3.3V, 8 MHz, ATMega328P board selected"
+    #define USE_PINCHANGE_INTP  1
+    #define CHB_INTP_PORT       PINB
+    #define CHB_INTP_PIN        6
+// Illuminado Transmitter Boards
+#elif (ILLUMINADO_TX_V10 == 1)
+    #warning "ChibiArduino Notification: Illuminado Transmitter, 5.0V, 16 MHz, ATMega328P board selected"
+    #define USE_PINCHANGE_INTP  0
+    #define CHB_INTP_PORT       PIND
+    #define CHB_INTP_PIN        3
+// Saboten Series Boards
+#elif (SABOTEN_2G4HZ_V10 == 1)
+    #warning "ChibiArduino Notification: Saboten, 3.3V, 8 MHz, ATMega1284P board selected" 
+    #define USE_PINCHANGE_INTP  1
+    #define CHB_INTP_PORT       PINA
+    #define CHB_INTP_PIN        6
+// Arashi Ethernet Gateway Series Boards
+#elif (ARASHI_ENET_GATEWAY_2G4HZ_v10 == 1)
+    #warning "ChibiArduino Notification: Arashi Ethernet Gateway, 3.3V, 8 MHz, ATMega1284P selected"
+    #define USE_PINCHANGE_INTP  1
+    #define CHB_INTP_PORT       PINA
+    #define CHB_INTP_PIN        6
+// Non-FreakLabs Boards
+#else
+    #warning "ChibiArduino Notification: No board selected. Defaulting to Freakduino Standard."
+    #define USE_PINCHANGE_INTP  1
+    #define CHB_INTP_PORT       PINB
+    #define CHB_INTP_PIN        6
+#endif
+
+/**************************************************************************/
+/*!
  Normally, when data is received to the radio, the radio will issue an interrupt
  to the microcontroller(MCU). The MCU will then move the data from the radio
  to the MCU memory. This needs to be done as quickly as possible since any other
@@ -139,7 +189,6 @@
 #define CHB_SPI_CS_DDIR DDRC
 #define CHB_SPI_CS_PIN  3                 // PC.3 - SPI Chip Select (SSEL)
 
-
 /**************************************************************************/
 /*!
     This is where the IRQ vector is defined. The IRQ vector will be based
@@ -148,8 +197,12 @@
         CHB_RADIO_IRQ default PCINT0_vect on the chibiduino
 */
 /**************************************************************************/
-#define CHB_RADIO_IRQ       PCINT0_vect
-    
+#if (USE_PINCHANGE_INTP == 1)
+    #define CHB_RADIO_IRQ       PCINT0_vect
+#else
+    #define CHB_RADIO_IRQ       INT1_vect
+#endif
+
 /**************************************************************************/    
 /*!
     This is where the interrupt configuration code is. This may be different
@@ -157,12 +210,21 @@
 */
 /**************************************************************************/    
 // enable rising edge interrupt on IRQ0
-#define CFG_CHB_INTP() do               \
-            {                           \
-                PCMSK0 |= _BV(PCINT6);  \
-                PCICR |= _BV(PCIE0);    \
-            }                           \ 
-            while(0)
+#if (USE_PINCHANGE_INTP == 1)
+    #define CFG_CHB_INTP() do               \
+                {                           \
+                    PCMSK0 |= _BV(PCINT6);  \
+                    PCICR |= _BV(PCIE0);    \
+                }                           \
+                while(0)
+#else
+    #define CFG_CHB_INTP() do                           \
+                {                                       \
+                    EICRA |= _BV(ISC10) | _BV(ISC11);   \
+                    EIMSK |= _BV(INT1);                 \
+                }                                       \
+                while (0)
+#endif
 
 /**************************************************************************/
 /*!
@@ -174,21 +236,70 @@
     off until the SPI bus is free and the data can be retrieved without collision.
 */
 /**************************************************************************/
-#define CHB_IRQ_DISABLE() do {PCMSK0 &= ~_BV(PCINT6);} while(0)
-#define CHB_IRQ_ENABLE() do {PCMSK0 |= _BV(PCINT6);} while(0)
-
+#if (USE_PINCHANGE_INTP == 1)
+    #define CHB_IRQ_DISABLE() do {PCMSK0 &= ~_BV(PCINT6);} while(0)
+    #define CHB_IRQ_ENABLE() do {PCMSK0 |= _BV(PCINT6);} while(0)
+#else
+    #define CHB_IRQ_DISABLE() do {EIMSK &= ~_BV(INT1);} while(0)
+    #define CHB_IRQ_ENABLE() do {EIMSK |= _BV(INT1);} while(0)
+#endif
 
 /**************************************************************************/
 /*!
-    The default channel for the radio to start on. The 802.15.4 channels go from
-    channel 11 to 26. Channels that don't conflict with 802.11 (Wi-Fi) are
-    channels 15, 20, and 26 in North America and Europe. 
-    
-        Integer; Range: 11 - 26; Default: 11
+    The default channel for the radio to start on.
+ 
+    For 802.15.4 in the 868/915 MHz band, the channels go from 0 to 10. Channel
+    0 is 868.3 MHz and is the only channel in the 900 MHz band that can be used
+    license free in Europe. Channels 1 through 10 are in the 915 MHz band and
+    can be used license free in most of North America. These channels require a
+    868/915 MHz radio.
+ 
+            Channel     Frequency (MHz)
+            0           868.3
+            1           906
+            2           908
+            3           910
+            4           912
+            5           914
+            6           916
+            7           918
+            8           920
+            9           922
+            10          924
+ 
+    For 802.15.4 in the 2.4 GHz band, the channels go from 11 to 26. Channels that
+    don't conflict with 802.11 (Wi-Fi) are channels 15, 20, and 26. These channels are
+    license free worldwide. They also require a 2.4 GHz radio.
+ 
+            Channel     Frequency (MHz)
+            11          2405
+            12          2410
+            13          2415
+            14          2420
+            15          2425
+            16          2430
+            17          2435
+            18          2440
+            19          2445
+            20          2450
+            21          2455
+            22          2460
+            23          2465
+            24          2470
+            25          2475
+            26          2480
 */
 /**************************************************************************/
 #define CHB_2_4GHZ_DEFAULT_CHANNEL     11
 #define CHB_900MHZ_DEFAULT_CHANNEL     1
+
+/**************************************************************************/
+/*!
+    This is the default modulation mode for the 900 MHz boards using the
+    AT86RF212. 
+*/
+/**************************************************************************/
+#define CHB_INIT_MODE OQPSK_SIN    
 
 /**************************************************************************/
 /*!
@@ -274,6 +385,5 @@
 */
 /**************************************************************************/
 #define CHB_CCA_ED_THRES    0x7
-
 
 #endif
