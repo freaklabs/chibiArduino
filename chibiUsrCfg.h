@@ -95,33 +95,6 @@
 
 /**************************************************************************/
 /*!
- Normally, when data is received to the radio, the radio will issue an interrupt
- to the microcontroller(MCU). The MCU will then move the data from the radio
- to the MCU memory. This needs to be done as quickly as possible since any other
- frame received by the radio will overwrite the previous one. Hence the data is
- moved inside the interrupt service routine.
- 
- In some cases, this is not desired, especially if there are other devices that are
- extremely busy and have tight timing requirements. In this case, RX POLLING MODE
- will simply flag the interrupt and the data will get moved at the next possible chance
- by the MCU. Its called RX POLLING MODE because the interrupt flag is checked
- outside of the interrupt service routine on each iteration of the main loop (polling).
- 
- RX POLLING MODE also resolves an issue with the Arduino Ethernet shield where the
- software makes it incompatible with devices that access the SPI bus inside an
- interrupt service routine.
- 
-        Value       Polling Mode
-        0x0         Disable (Default)
-        0x1         Enable
-
-
-*/
-/**************************************************************************/
-#define CHB_RX_POLLING_MODE  0
-
-/**************************************************************************/
-/*!
     Enable the chibiArduino stack to run in promiscuous mode. This should
     only be used to analyze raw packet frames, like for wireshark. 
 */
