@@ -130,7 +130,7 @@ enum
 enum
 {
     CHB_MAX_FRAME_RETRIES_POS   = 4,
-    CHB_MAX_CSMA_RETIRES_POS    = 1,
+    CHB_MAX_CSMA_RETRIES_POS    = 1,
     CHB_MIN_BE_POS              = 6,
     CHB_CSMA_SEED1_POS          = 0,
     CHB_CCA_MODE_POS            = 5,

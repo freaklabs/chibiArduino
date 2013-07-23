@@ -612,12 +612,20 @@ U8 chb_tx(U8 *hdr, U8 *data, U8 len)
     // transition to the Transmit state
     chb_set_state(TX_ARET_ON);
 
+    // check to make sure we're in the correct state. if not, then continue changing the state
+    // until we're in the proper state
+    while (chb_get_state() != TX_ARET_ON)
+    {
+        chb_set_state(TX_ARET_ON);
+    }
+
     // write frame to buffer. first write header into buffer (add 1 for len byte), then data. 
     chb_frame_write(hdr, CHB_HDR_SZ + 1, data, len);
 
     //Do frame transmission. 
     pcb->trx_end = false;
     chb_reg_read_mod_write(TRX_STATE, CMD_TX_START, 0x1F);
+
 
     // wait for the transmission to end, signalled by the TRX END flag
     while (!pcb->trx_end)
@@ -661,7 +669,7 @@ static void chb_radio_init()
     // set radio cfg parameters
     // **note** uncomment if these will be set to something other than default
     chb_reg_read_mod_write(XAH_CTRL_0, CHB_MAX_FRAME_RETRIES << CHB_MAX_FRAME_RETRIES_POS, 0xF << CHB_MAX_FRAME_RETRIES_POS);
-    //chb_reg_read_mod_write(XAH_CTRL_0, CHB_MAX_CSMA_RETRIES << CHB_MAX_CSMA_RETRIES_POS, 0x7 << CHB_MAX_CSMA_RETIRES_POS);
+    //chb_reg_read_mod_write(XAH_CTRL_0, CHB_MAX_CSMA_RETRIES << CHB_MAX_CSMA_RETRIES_POS, 0x7 << CHB_MAX_CSMA_RETRIES_POS);
     //chb_reg_read_mod_write(CSMA_SEED_1, CHB_MIN_BE << CHB_MIN_BE_POS, 0x3 << CHB_MIN_BE_POS);     
     //chb_reg_read_mod_write(CSMA_SEED_1, CHB_CSMA_SEED1 << CHB_CSMA_SEED1_POS, 0x7 << CHB_CSMA_SEED1_POS);        
     //chb_reg_read_mod_write(PHY_CC_CCA, CHB_CCA_MODE << CHB_CCA_MODE_POS,0x3 << CHB_CCA_MODE_POS);
@@ -740,7 +748,7 @@ static void chb_radio_init()
     chb_reg_read(IRQ_STATUS);
 
     // re-enable intps while we config the radio
-    chb_reg_write(IRQ_MASK, 0xc);
+    chb_reg_write(IRQ_MASK, 0x08);
 
     // enable mcu intp pin on INT6 for rising edge
     CFG_CHB_INTP();
