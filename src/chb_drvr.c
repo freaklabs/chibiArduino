@@ -648,6 +648,37 @@ U8 chb_get_part_num()
     return chb_reg_read(PART_NUM);
 }
 
+
+#if (FREAKDUINO_LONG_RANGE == 1)    
+/**************************************************************************/
+/*!
+    Enable the high gain mode pin
+*/
+/**************************************************************************/        
+    void chb_high_gain_mode_enable()
+    {
+        #if (ARASHI_ENET_GATEWAY == 1)
+            PORTC |= (1<<5); 
+        #else
+            PORTB |= (1<<7);
+        #endif
+    }
+
+/**************************************************************************/
+/*!
+    Disable the high gain mode pin
+*/
+/**************************************************************************/
+    void chb_high_gain_mode_disable()
+    {
+        #if (ARASHI_ENET_GATEWAY == 1)
+            PORTC &= ~(1<<5); 
+        #else
+            PORTB &= ~(1<<7);
+        #endif
+    }
+#endif
+
 /**************************************************************************/
 /*!
     Initialize the radio registers.
@@ -718,10 +749,30 @@ static void chb_radio_init()
         // all data rates.
         chb_reg_read_mod_write(XOSC_CTRL, 0x04, 0x0F);
 
-#if (CHIBI_PROMISCUOUS == 0)
-    // set autocrc mode
-    chb_reg_read_mod_write(TRX_CTRL1, 1 << 5, 1 << 5);
-#endif
+        #if (CHIBI_PROMISCUOUS == 0)
+            // set autocrc mode
+            chb_reg_read_mod_write(TRX_CTRL1, 1 << 5, 1 << 5);
+        #endif
+
+        #if (FREAKDUINO_LONG_RANGE == 1)            
+          // enable the rf front end controller
+          tmp = chibiRegRead(TRX_CTRL1);
+          tmp |= 0x80;
+          chibiRegWrite(TRX_CTRL1, tmp);
+
+          // enable the high gain mode pin
+          #if (ARASHI_ENET_GATEWAY == 1)
+            DDRC |= 1<<5;
+            PORTC |= 1<<5; 
+          #else
+            DDRB |= 1<<7;
+            PORTB |= (1<<7);
+          #endif
+          
+
+        #endif
+
+    
         break;
 
     default:
@@ -753,6 +804,7 @@ static void chb_radio_init()
     // enable mcu intp pin on INT6 for rising edge
     CFG_CHB_INTP();
 
+    // make sure we're in the right state
     if (chb_get_state() != RX_STATE)
     {
         // ERROR occurred initializing the radio. Print out error message.
@@ -805,6 +857,11 @@ void chb_sleep(U8 enb)
 {
     if (enb)
     {
+        // if we're using a long range device, disable the high gain mode pin
+        #if (FREAKDUINO_LONG_RANGE == 1)    
+            chb_high_gain_mode_disable();
+        #endif
+
         // first we need to go to TRX OFF state
         chb_set_state(TRX_OFF);
 
@@ -818,6 +875,11 @@ void chb_sleep(U8 enb)
     }
     else
     {
+        // if we're using a long range device, enable the high gain mode pin
+        #if (FREAKDUINO_LONG_RANGE == 1)    
+            chb_high_gain_mode_enable();
+        #endif
+
         // make sure the SLPTR pin is low first
         CHB_SLPTR_PORT &= ~(_BV(CHB_SLPTR_PIN));
 

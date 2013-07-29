@@ -50,37 +50,37 @@
 /**************************************************************************/
 
 // Freakduino Series Boards
-#if (FREAKDUINO_V21 == 1)
+#if (FREAKDUINO == 1)
     #warning "ChibiArduino Notification: Freakduino Starndard, 5.0V, 8 MHz, ATMega328P board selected"
     #define USE_PINCHANGE_INTP  1
     #define CHB_INTP_PORT       PINB
     #define CHB_INTP_PIN        6
 // Freakduino Long Range Series Boards
-#elif (FREAKDUINO_LONG_RANGE_V21 == 1)
+#elif (FREAKDUINO_LONG_RANGE == 1)
     #warning "ChibiArduino Notification: Freakduino Long Range, 5.0V, 8 MHz, ATMega328P board selected"
     #define USE_PINCHANGE_INTP  1
     #define CHB_INTP_PORT       PINB
     #define CHB_INTP_PIN        6
 // Illuminado Receiver Boards
-#elif (ILLUMINADO_RX_V12 == 1)
+#elif (ILLUMINADO_RX == 1)
     #warning "ChibiArduino Notification: Illuminado Receiver, 3.3V, 8 MHz, ATMega328P board selected"
     #define USE_PINCHANGE_INTP  1
     #define CHB_INTP_PORT       PINB
     #define CHB_INTP_PIN        6
 // Illuminado Transmitter Boards
-#elif (ILLUMINADO_TX_V10 == 1)
+#elif (ILLUMINADO_TX == 1)
     #warning "ChibiArduino Notification: Illuminado Transmitter, 5.0V, 16 MHz, ATMega328P board selected"
     #define USE_PINCHANGE_INTP  0
     #define CHB_INTP_PORT       PIND
     #define CHB_INTP_PIN        3
 // Saboten Series Boards
-#elif (SABOTEN_2G4HZ_V10 == 1)
+#elif (SABOTEN == 1)
     #warning "ChibiArduino Notification: Saboten, 3.3V, 8 MHz, ATMega1284P board selected" 
     #define USE_PINCHANGE_INTP  1
     #define CHB_INTP_PORT       PINA
     #define CHB_INTP_PIN        6
 // Arashi Ethernet Gateway Series Boards
-#elif (ARASHI_ENET_GATEWAY_2G4HZ_v10 == 1)
+#elif (ARASHI_ENET_GATEWAY == 1)
     #warning "ChibiArduino Notification: Arashi Ethernet Gateway, 3.3V, 8 MHz, ATMega1284P selected"
     #define USE_PINCHANGE_INTP  1
     #define CHB_INTP_PORT       PINA

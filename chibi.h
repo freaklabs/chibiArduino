@@ -81,4 +81,10 @@ void chibiSetMode(uint8_t mode);
 
 void chibiAesTest(uint8_t *key);
 
+#if (FREAKDUINO_LONG_RANGE == 1)    
+    void chibiHighGainModeEnable();
+    void chibiHighGainModeDisable();
 #endif
+
+#endif
+

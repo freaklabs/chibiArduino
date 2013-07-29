@@ -37,7 +37,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include "chibiUsrCfg.h"
-#include "types.h"
+#include "types.h"       
 
 #define CHB_CC1190_PRESENT      0       /// Set to 1 if CC1190 is being used
 #define CHB_CHINA               0       /// Support 780 MHz Chinese band        
@@ -284,5 +284,10 @@ void chb_set_mode();
 
 // data transmit
 U8 chb_tx(U8 *hdr, U8 *data, U8 len);
+
+#if (FREAKDUINO_LONG_RANGE == 1)    
+    void chb_high_gain_mode_enable();
+    void chb_high_gain_mode_disable();
+#endif
 
 #endif
