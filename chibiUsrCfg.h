@@ -51,7 +51,7 @@
 
 // Freakduino Series Boards
 #if (FREAKDUINO == 1)
-    #warning "ChibiArduino Notification: Freakduino Starndard, 5.0V, 8 MHz, ATMega328P board selected"
+    #warning "ChibiArduino Notification: Freakduino Standard, 5.0V, 8 MHz, ATMega328P board selected"
     #define USE_PINCHANGE_INTP  1
     #define CHB_INTP_PORT       PINB
     #define CHB_INTP_PIN        6

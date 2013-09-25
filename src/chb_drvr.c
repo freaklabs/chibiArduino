@@ -741,7 +741,7 @@ static void chb_radio_init()
 
         // set default channel and tx power to max
         chb_set_channel(CHB_900MHZ_DEFAULT_CHANNEL);
-        chb_reg_read_mod_write(PHY_TX_PWR, CHB_900MHZ_TX_PWR, 0xf);
+        chb_reg_write(PHY_TX_PWR, CHB_900MHZ_TX_PWR);
         //Serial.println("AT86RF212 900 MHz radio detected.");
 
         // set crystal trim to improve signal reception
@@ -760,7 +760,10 @@ static void chb_radio_init()
           tmp |= 0x80;
           chibiRegWrite(TRX_CTRL1, tmp);
 
-          // enable the high gain mode pin
+          // set the power to 5 dBm, the max for the CC1190 front end
+          chb_reg_write(PHY_TX_PWR, 0x84);
+
+          // enable the high gain mode pin on the rx amp
           #if (ARASHI_ENET_GATEWAY == 1)
             DDRC |= 1<<5;
             PORTC |= 1<<5; 
@@ -768,11 +771,7 @@ static void chb_radio_init()
             DDRB |= 1<<7;
             PORTB |= (1<<7);
           #endif
-          
-
         #endif
-
-    
         break;
 
     default:
