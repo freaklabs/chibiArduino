@@ -763,6 +763,11 @@ static void chb_radio_init()
           // set the power to 5 dBm, the max for the CC1190 front end
           chb_reg_write(PHY_TX_PWR, 0x84);
 
+          // set crystal trim to improve signal reception
+          // found that a value of 0xA works well across all channels &
+          // all modes w/long range board.
+          chb_reg_read_mod_write(XOSC_CTRL, 0x0A, 0x0F);
+
           // enable the high gain mode pin on the rx amp
           #if (ARASHI_ENET_GATEWAY == 1)
             DDRC |= 1<<5;

@@ -79,6 +79,12 @@
     #define USE_PINCHANGE_INTP  1
     #define CHB_INTP_PORT       PINA
     #define CHB_INTP_PIN        6
+// Sniffer boards
+#elif (SNIFFER == 1)
+    #warning "ChibiArduino Notification: Sniffer, 3.3V, 8 MHz, ATMega1284P board selected" 
+    #define USE_PINCHANGE_INTP  1
+    #define CHB_INTP_PORT       PINA
+    #define CHB_INTP_PIN        6
 // Arashi Ethernet Gateway Series Boards
 #elif (ARASHI_ENET_GATEWAY == 1)
     #warning "ChibiArduino Notification: Arashi Ethernet Gateway, 3.3V, 8 MHz, ATMega1284P selected"
