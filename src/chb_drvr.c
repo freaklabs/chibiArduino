@@ -356,24 +356,27 @@ U8 chb_get_rand()
 /**************************************************************************/
 void chb_set_mode(U8 mode)
 {
-    switch (mode)
+    if (radio_id == CHB_AT86RF212)
     {
-    case OQPSK_SINRC:
-        chb_reg_read_mod_write(TRX_CTRL_2, 0x28, 0x3f);                 // 802.15.4-2006, channel page 2, channel 0 (868 MHz, Europe)
-        chb_reg_read_mod_write(RF_CTRL_0, CHB_OQPSK_TX_OFFSET, 0x3);    // this is according to table 7-16 in at86rf212 datasheet
-        break;
-    case OQPSK_SIN:
-        chb_reg_read_mod_write(TRX_CTRL_2, 0x2c, 0x3f);                 // 802.15.4-2006, channel page 2, channels 1-10 (915 MHz, US)
-        chb_reg_read_mod_write(RF_CTRL_0, CHB_OQPSK_TX_OFFSET, 0x3);    // this is according to table 7-16 in at86rf212 datasheet
-        break;
-    case OQPSK_RC:
-        chb_reg_read_mod_write(TRX_CTRL_2, 0x3c, 0x3f);                 // 802.15.4-2006, channel page 5, channel 0-3 (780 MHz, China)
-        chb_reg_read_mod_write(RF_CTRL_0, CHB_OQPSK_TX_OFFSET, 0x3);    // this is according to table 7-16 in at86rf212 datasheet
-        break;
-    case BPSK_40:
-        chb_reg_read_mod_write(TRX_CTRL_2, 0x20, 0x3f);                 // 802.15.4-2006, BPSK, 40 kbps
-        chb_reg_read_mod_write(RF_CTRL_0, CHB_BPSK_TX_OFFSET, 0x3);     // this is according to table 7-16 in at86rf212 datasheet
-        break;
+        switch (mode)
+        {
+        case OQPSK_SINRC:
+            chb_reg_read_mod_write(TRX_CTRL_2, 0x28, 0x3f);                 // 802.15.4-2006, channel page 2, channel 0 (868 MHz, Europe)
+            chb_reg_read_mod_write(RF_CTRL_0, CHB_OQPSK_TX_OFFSET, 0x3);    // this is according to table 7-16 in at86rf212 datasheet
+            break;
+        case OQPSK_SIN:
+            chb_reg_read_mod_write(TRX_CTRL_2, 0x2c, 0x3f);                 // 802.15.4-2006, channel page 2, channels 1-10 (915 MHz, US)
+            chb_reg_read_mod_write(RF_CTRL_0, CHB_OQPSK_TX_OFFSET, 0x3);    // this is according to table 7-16 in at86rf212 datasheet
+            break;
+        case OQPSK_RC:
+            chb_reg_read_mod_write(TRX_CTRL_2, 0x3c, 0x3f);                 // 802.15.4-2006, channel page 5, channel 0-3 (780 MHz, China)
+            chb_reg_read_mod_write(RF_CTRL_0, CHB_OQPSK_TX_OFFSET, 0x3);    // this is according to table 7-16 in at86rf212 datasheet
+            break;
+        case BPSK_40:
+            chb_reg_read_mod_write(TRX_CTRL_2, 0x20, 0x3f);                 // 802.15.4-2006, BPSK, 40 kbps
+            chb_reg_read_mod_write(RF_CTRL_0, CHB_BPSK_TX_OFFSET, 0x3);     // this is according to table 7-16 in at86rf212 datasheet
+            break;
+        }
     }
 }
 
