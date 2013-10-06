@@ -48,6 +48,10 @@ void loop()
     
     // retrieve the data and the signal strength
     len = chibiGetData(buf);
+
+    // discard the data if the length is 0. that means its a duplicate packet
+    if (len == 0) return;    
+
     rssi = chibiGetRSSI();
     src_addr = chibiGetSrcAddr();
     

@@ -54,6 +54,9 @@ void loop()
     byte len, pos, buf[CHB_MAX_PAYLOAD];
     len = chibiGetData(buf); 
     
+    // discard data if length = 0. that means its a duplicate packet
+    if (len == 0) return;
+    
     // Its assumed that the data will be in the first byte of the data
     pos = buf[0];
     if ((pos >= 0) && (pos <=180))

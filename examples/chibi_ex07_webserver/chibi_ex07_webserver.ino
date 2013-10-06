@@ -173,6 +173,10 @@ void chibiRcv()
   if (chibiDataRcvd() == true)
   { 
      len = chibiGetData(buf); 
+     
+     // if length = 0, then discard packet. that means it's a duplicate packet
+     if (len == 0) return;
+
      rssi = chibiGetRSSI();
      
      // Print out the message and the signal strength
