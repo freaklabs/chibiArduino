@@ -295,6 +295,32 @@
 /*!
     This is the value that gets written into the radio's register. Each value
     corresponds to a different transmit power in dBm. The mapping is as follows:
+ 
+    2.4 GHz             915 MHz N America   EU1     EU2
+    dBm     Value        dBm    Value                   
+    3.0     0x0          10     0xE1           
+    2.8     0x1          9      0xA1           
+    2.3     0x2          8      0x81           
+    1.8     0x3          7      0x82           
+    1.3     0x4          6      0x83           
+    0.7     0x5          5      0x84                0xE8
+    0.0     0x6          4      0x85        0x62    0xE9
+    -1      0x7          3      0x42        0x63    0xEA
+    -2      0x8          2      0x22        0x64    0xEB
+    -3      0x9          1      0x23        0x65    0xAB
+    -4      0xA          0      0x24        0x66    0xAC
+    -5      0xB          -1     0x25        0x47    0xAD
+    -7      0xC          -2     0x04        0x48    0x48
+    -9      0xD          -3     0x05        0x28    0x28
+    -12     0xE          -4     0x06        0x29    0x29
+    -17     0xF          -5     0x07        0x2A    0x2A
+                         -6     0x08        0x08    0x08
+                         -7     0x09        0x09    0x09
+                         -8     0x0A        0x0A    0x0A
+                         -9     0x0B        0x0B    0x0B
+                         -10    0x0C        0x0C    0x0C
+                         -11    0x0D        0x0D    0x0D
+ 
 */
 /**************************************************************************/
 #define CHB_2_4GHZ_TX_PWR  0x0
