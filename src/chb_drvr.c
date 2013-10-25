@@ -757,7 +757,7 @@ static void chb_radio_init()
             chb_reg_read_mod_write(TRX_CTRL1, 1 << 5, 1 << 5);
         #endif
 
-        #if (FREAKDUINO_LONG_RANGE == 1)            
+        #if ((FREAKDUINO_LONG_RANGE == 1) || (SABOTEN == 1))            
           // enable the rf front end controller
           tmp = chibiRegRead(TRX_CTRL1);
           tmp |= 0x80;
@@ -775,6 +775,9 @@ static void chb_radio_init()
           #if (ARASHI_ENET_GATEWAY == 1)
             DDRC |= 1<<5;
             PORTC |= 1<<5; 
+          #elif (SABOTEN == 1)
+            DDRC |= 1<<6;
+            PORTC |= 1<<6;
           #else
             DDRB |= 1<<7;
             PORTB |= (1<<7);
@@ -862,10 +865,17 @@ void chb_drvr_init()
 /**************************************************************************/
 void chb_sleep(U8 enb)
 {
+    uint8_t tmp;
+
     if (enb)
     {
         // if we're using a long range device, disable the high gain mode pin
         #if (FREAKDUINO_LONG_RANGE == 1)    
+            // disable RF front end
+            tmp = chibiRegRead(TRX_CTRL1);
+            tmp &= ~(0x80);
+            chibiRegWrite(TRX_CTRL1, tmp);
+
             chb_high_gain_mode_disable();
         #endif
 
@@ -884,6 +894,11 @@ void chb_sleep(U8 enb)
     {
         // if we're using a long range device, enable the high gain mode pin
         #if (FREAKDUINO_LONG_RANGE == 1)    
+            // enable the RF front end
+            tmp = chibiRegRead(TRX_CTRL1);
+            tmp |= 0x80;
+            chibiRegWrite(TRX_CTRL1, tmp);
+
             chb_high_gain_mode_enable();
         #endif
 
