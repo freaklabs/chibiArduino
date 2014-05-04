@@ -42,7 +42,7 @@
         // SNIFFER uses the ATMega1284P which has 16 kB RAM so we can crank up the 
         // radio buffer size
         #define CHB_BUF_SZ 10000
-    #elif
+    #else
         // if we're using promiscuous mode, we may end up capturing a lot of frames.
         // crank up the buffer size to handle traffic spikes.
         #define CHB_BUF_SZ 768
