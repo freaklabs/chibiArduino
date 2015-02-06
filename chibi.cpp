@@ -73,6 +73,18 @@ void chibiInit()
 
 /**************************************************************************/
 /*!
+    Initialize the command echo and prompt display settings
+*/
+/**************************************************************************/
+
+void chibiDisplayFlags(char prompt, char echo)
+{
+	cmd_prompt_flag = prompt;
+	cmd_echo_flag = echo;
+}
+
+/**************************************************************************/
+/*!
     Set the short address of the wireless node. This is the 16-bit "nickname" 
     of your node and what will be used to identify it. 
 */
