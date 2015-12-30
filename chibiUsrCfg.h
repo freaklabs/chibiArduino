@@ -50,14 +50,8 @@
 /**************************************************************************/
 
 // Freakduino Series Boards
-#if (FREAKDUINO == 1)
+#if ((FREAKDUINO == 1) || (FREAKDUINO_LONG_RANGE == 1))
     #warning "ChibiArduino Notification: Freakduino Standard, 5.0V, 8 MHz, ATMega328P board selected"
-    #define USE_PINCHANGE_INTP  1
-    #define CHB_INTP_PORT       PINB
-    #define CHB_INTP_PIN        6
-// Freakduino Long Range Series Boards
-#elif (FREAKDUINO_LONG_RANGE == 1)
-    #warning "ChibiArduino Notification: Freakduino Long Range, 5.0V, 8 MHz, ATMega328P board selected"
     #define USE_PINCHANGE_INTP  1
     #define CHB_INTP_PORT       PINB
     #define CHB_INTP_PIN        6
@@ -79,19 +73,24 @@
     #define USE_PINCHANGE_INTP  1
     #define CHB_INTP_PORT       PINA
     #define CHB_INTP_PIN        6
-// Sniffer boards
-#elif (SNIFFER == 1)
-    #warning "ChibiArduino Notification: Sniffer, 3.3V, 8 MHz, ATMega1284P board selected" 
+// FREAKDUINO1284P Series Boards
+#elif ((FREAKDUINO1284P == 1) || (FREAKDUINO1284PLR == 1))
+    #warning "ChibiArduino Notification: FREAKDUINO1284P, 5V, 8 MHz, ATMega1284P board selected" 
+    #define USE_PINCHANGE_INTP  1
+    #define CHB_INTP_PORT       PINA
+    #define CHB_INTP_PIN        6
+// FREAKUSB1284P boards
+#elif ((FREAKUSB1284P == 1) || (FREAKUSB1284PLR == 1))
+    #warning "ChibiArduino Notification: FREAKUSB1284P, 3.3V, 8 MHz, ATMega1284P board selected" 
     #define USE_PINCHANGE_INTP  1
     #define CHB_INTP_PORT       PINA
     #define CHB_INTP_PIN        6
 // Arashi Ethernet Gateway Series Boards
-#elif (ARASHI_ENET_GATEWAY == 1)
+#elif ((ARASHI_ENET_GATEWAY == 1) || (ARASHI_ENET_GATEWAY_LR == 1))
     #warning "ChibiArduino Notification: Arashi Ethernet Gateway, 3.3V, 8 MHz, ATMega1284P selected"
     #define USE_PINCHANGE_INTP  1
     #define CHB_INTP_PORT       PINA
     #define CHB_INTP_PIN        6
-// Non-FreakLabs Boards
 #else
     #warning "ChibiArduino Notification: No board selected. Defaulting to Freakduino Standard."
     #define USE_PINCHANGE_INTP  1
@@ -150,9 +149,15 @@
         CHB_SLPTR_PIN default 2 on the chibiduino.
 */
 /**************************************************************************/
-#define CHB_SLPTR_PORT       PORTC
-#define CHB_SLPTR_DDIR       DDRC
-#define CHB_SLPTR_PIN        2
+#if ((FREAKDUINO1284P == 1) || (FREAKDUINO1284PLR == 1) || (FREAKUSB1284P == 1) || (FREAKUSB1284PLR == 1) || (SABOTEN == 1))
+    #define CHB_SLPTR_PORT       PORTA
+    #define CHB_SLPTR_DDIR       DDRA
+    #define CHB_SLPTR_PIN        5
+#else
+    #define CHB_SLPTR_PORT       PORTC
+    #define CHB_SLPTR_DDIR       DDRC
+    #define CHB_SLPTR_PIN        2
+#endif
 
 /**************************************************************************/
 /*!
@@ -164,9 +169,15 @@
         CHB_SPI_CS_PIN default 3 on the chibiduino.
 */
 /**************************************************************************/
-#define CHB_SPI_CS_PORT PORTC
-#define CHB_SPI_CS_DDIR DDRC
-#define CHB_SPI_CS_PIN  3                 // PC.3 - SPI Chip Select (SSEL)
+#if ((FREAKDUINO1284P == 1) || || (FREAKDUINO1284PLR == 1) || (SABOTEN == 1) || (ARASHI_ENET_GATEWAY == 1) || (ARASHI_ENET_GATEWAY_LR == 1) || (FREAKUSB1284P == 1) || (FREAKUSB1284PLR == 1))
+    #define CHB_SPI_CS_PORT PORTC
+    #define CHB_SPI_CS_DDIR DDRC
+    #define CHB_SPI_CS_PIN  7                 // PC.3 - SPI Chip Select (SSEL)
+#else
+    #define CHB_SPI_CS_PORT PORTC
+    #define CHB_SPI_CS_DDIR DDRC
+    #define CHB_SPI_CS_PIN  3                 // PC.3 - SPI Chip Select (SSEL)
+#endif
 
 /**************************************************************************/
 /*!
@@ -276,6 +287,11 @@
 /*!
     This is the default modulation mode for the 900 MHz boards using the
     AT86RF212. 
+					
+	Other modulations that are available
+	#define  CHB_INIT_MODE OQPSK_SINRC
+	#define  CHB_INIT_MODE OQPSK_RC
+	#define  CHB_INIT_MODE BPSK_40
 */
 /**************************************************************************/
 #define CHB_INIT_MODE OQPSK_SIN    

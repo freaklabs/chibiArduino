@@ -372,7 +372,7 @@ void chibiAesTest(uint8_t *key)
     chb_aes_test(key);
 }
 
-#if (FREAKDUINO_LONG_RANGE == 1)    
+#if ((FREAKDUINO_LONG_RANGE == 1) || (SABOTEN == 1) || (ARASHI_ENET_GATEWAY_LR == 1) || (FREAKDUINO1284PLR == 1) || (FREAKUSB1284PLR == 1)) 
     /**************************************************************************/
     /*!
         
