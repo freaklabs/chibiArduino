@@ -149,7 +149,7 @@
         CHB_SLPTR_PIN default 2 on the chibiduino.
 */
 /**************************************************************************/
-#if ((FREAKDUINO1284P == 1) || (FREAKDUINO1284PLR == 1) || (FREAKUSB1284P == 1) || (FREAKUSB1284PLR == 1)
+#if ((FREAKDUINO1284P == 1) || (FREAKDUINO1284PLR == 1) || (FREAKUSB1284P == 1) || (FREAKUSB1284PLR == 1))
     #define CHB_SLPTR_PORT       PORTA
     #define CHB_SLPTR_DDIR       DDRA
     #define CHB_SLPTR_PIN        5
