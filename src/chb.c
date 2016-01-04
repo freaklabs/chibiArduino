@@ -41,8 +41,8 @@
 static pcb_t pcb;
 
 // these are for the duplicate checking and rejection
-static U8 prev_seq = 0xFF;
-static U16 prev_src_addr = 0xFFFE;
+static U8 prev_seq;
+static U16 prev_src_addr;
 
 /**************************************************************************/
 /*!
@@ -53,6 +53,12 @@ void chb_init()
 {
     memset(&pcb, 0, sizeof(pcb_t));
     pcb.src_addr = chb_get_short_addr();
+
+    // reset prev_seq and prev_src_addr to default values
+    // there's a problem if the radio gets re-initialized since no initializing the prev_seq and 
+    // prev_src_addr will result in a bug where the data could get flagged as a dupe
+    prev_seq = 0xFF;
+    prev_src_addr = 0xFFFE; 
 
     // if SPI slave select pin is input, enable internal pullup on it.
     // otherwise it will constantly fall into spi slave mode and hang everything.

@@ -217,10 +217,18 @@ enum
 // transceiver modes for AT86RF212
 enum
 {
-    OQPSK_SINRC = 0,
-    OQPSK_SIN   = 1,
-    OQPSK_RC    = 2,
-    BPSK_40     = 3
+    OQPSK_SINRC_100 = 0,
+    OQPSK_SIN_250   = 1,
+    OQPSK_RC        = 2,
+    OQPSK_RC_250    = 3,
+    OQPSK_SIN_500   = 4,
+    OQPSK_SIN_1000  = 5,
+    BPSK_40         = 6,
+    BPSK_20         = 7,
+    OQPSK_250       = 8,
+    OQPSK_500       = 9,
+    OQPSK_1000      = 10,
+    OQPSK_2000      = 11
 };
 
 // part numbers for atmel radios

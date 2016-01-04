@@ -360,21 +360,48 @@ void chb_set_mode(U8 mode)
     {
         switch (mode)
         {
-        case OQPSK_SINRC:
-            chb_reg_read_mod_write(TRX_CTRL_2, 0x28, 0x3f);                 // 802.15.4-2006, channel page 2, channel 0 (868 MHz, Europe)
-            chb_reg_read_mod_write(RF_CTRL_0, CHB_OQPSK_TX_OFFSET, 0x3);    // this is according to table 7-16 in at86rf212 datasheet
+        case OQPSK_SINRC_100:
+            chb_reg_read_mod_write(TRX_CTRL_2, 0x08, 0x3f);                 // 802.15.4-2006, channel page 2, channel 0 (868 MHz, Europe)
             break;
-        case OQPSK_SIN:
-            chb_reg_read_mod_write(TRX_CTRL_2, 0x2c, 0x3f);                 // 802.15.4-2006, channel page 2, channels 1-10 (915 MHz, US)
-            chb_reg_read_mod_write(RF_CTRL_0, CHB_OQPSK_TX_OFFSET, 0x3);    // this is according to table 7-16 in at86rf212 datasheet
+        case OQPSK_SIN_250:
+            chb_reg_read_mod_write(TRX_CTRL_2, 0x0c, 0x3f);                 // 802.15.4-2006, channel page 2, channels 1-10 (915 MHz, US)
             break;
-        case OQPSK_RC:
-            chb_reg_read_mod_write(TRX_CTRL_2, 0x3c, 0x3f);                 // 802.15.4-2006, channel page 5, channel 0-3 (780 MHz, China)
-            chb_reg_read_mod_write(RF_CTRL_0, CHB_OQPSK_TX_OFFSET, 0x3);    // this is according to table 7-16 in at86rf212 datasheet
+        case OQPSK_RC_250:
+            chb_reg_read_mod_write(TRX_CTRL_2, 0x1c, 0x3f);                 // 802.15.4-2006, channel page 5, channel 0-3 (780 MHz, China)
+            break;
+        case OQPSK_SIN_500:
+            chb_reg_read_mod_write(TRX_CTRL_2, 0x0d, 0x3f);                 // proprietary
+            break;
+        case OQPSK_SIN_1000:
+            chb_reg_read_mod_write(TRX_CTRL_2, 0x2e, 0x3f);                 // proprietary
             break;
         case BPSK_40:
-            chb_reg_read_mod_write(TRX_CTRL_2, 0x20, 0x3f);                 // 802.15.4-2006, BPSK, 40 kbps
-            chb_reg_read_mod_write(RF_CTRL_0, CHB_BPSK_TX_OFFSET, 0x3);     // this is according to table 7-16 in at86rf212 datasheet
+            chb_reg_read_mod_write(TRX_CTRL_2, 0x04, 0x3f);                 // 802.15.4-2006, BPSK, 40 kbps
+            break;
+        case BPSK_20:
+            chb_reg_read_mod_write(TRX_CTRL_2, 0x00, 0x3f);                 // 802.15.4-2006, BPSK, 20 kbps
+            break;
+        }
+    }
+    else if (radio_id == CHB_AT86RF231)
+    {
+        switch (mode)
+        {
+            case OQPSK_2000:            
+            chb_reg_read_mod_write(TRX_CTRL_2, 0x03, 0x03);                 // proprietary
+            chb_reg_read_mod_write(XAH_CTRL_1, 0x04, 0x04);                 // set auto ack time to be as fast as possible
+
+            break;
+            case OQPSK_1000:
+            chb_reg_read_mod_write(TRX_CTRL_2, 0x02, 0x03);                 // proprietary
+            chb_reg_read_mod_write(XAH_CTRL_1, 0x04, 0x04);                 // set auto ack time to be as fast as possible
+            break;
+            case OQPSK_500:
+            chb_reg_read_mod_write(TRX_CTRL_2, 0x01, 0x03);                 // proprietary
+            chb_reg_read_mod_write(XAH_CTRL_1, 0x04, 0x04);                 // set auto ack time to be as fast as possible
+            break;
+            case OQPSK_250:
+            chb_reg_read_mod_write(TRX_CTRL_2, 0x00, 0x03);                 // 802.15.4-2006-compliant
             break;
         }
     }
@@ -732,6 +759,9 @@ static void chb_radio_init()
         break;
 
     case CHB_AT86RF231:
+        // set init mode data rate
+        chb_set_mode(CHB_2_4GHZ_INIT_MODE);
+
         // set default channel
         chb_set_channel(CHB_2_4GHZ_DEFAULT_CHANNEL);
         //Serial.println("AT86RF231 2.4 GHz radio detected.");
@@ -744,7 +774,7 @@ static void chb_radio_init()
 
     case CHB_AT86RF212:
         // set mode to OQPSK or BPSK depending on setting
-        chb_set_mode(CHB_INIT_MODE);
+        chb_set_mode(CHB_900MHZ_INIT_MODE);
 
         // set default channel and tx power to max
         chb_set_channel(CHB_900MHZ_DEFAULT_CHANNEL);

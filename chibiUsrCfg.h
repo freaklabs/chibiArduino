@@ -55,6 +55,12 @@
     #define USE_PINCHANGE_INTP  1
     #define CHB_INTP_PORT       PINB
     #define CHB_INTP_PIN        6
+// FreakUSB Series Boards
+#elif ((FREAKUSB == 1) || (FREAKUSBLR == 1))
+    #warning "ChibiArduino Notification: FreakUSB, 3.3V, 8 MHz, ATMega328P board selected"
+    #define USE_PINCHANGE_INTP  1
+    #define CHB_INTP_PORT       PINB
+    #define CHB_INTP_PIN        6
 // Illuminado Receiver Boards
 #elif (ILLUMINADO_RX == 1)
     #warning "ChibiArduino Notification: Illuminado Receiver, 3.3V, 8 MHz, ATMega328P board selected"
@@ -280,21 +286,36 @@
             26          2480
 */
 /**************************************************************************/
-#define CHB_2_4GHZ_DEFAULT_CHANNEL     11
+#define CHB_2_4GHZ_DEFAULT_CHANNEL    11
 #define CHB_900MHZ_DEFAULT_CHANNEL     1
+
 
 /**************************************************************************/
 /*!
     This is the default modulation mode for the 900 MHz boards using the
+    AT86RF231. 
+                    
+    Other modulations that are available
+    #define  CHB_2_4GHZ_INIT_MODE OQPSK_2000        // proprietary
+    #define  CHB_2_4GHZ_INIT_MODE OQPSK_1000        // proprietary
+    #define  CHB_2_4GHZ_INIT_MODE OQPSK_500         // proprietary
+    #define  CHB_2_4GHZ_INIT_MODE OQPSK_250         // 802.15.4-2006 compliant
+
+    This is the default modulation mode for the 900 MHz boards using the
     AT86RF212. 
 					
 	Other modulations that are available
-	#define  CHB_INIT_MODE OQPSK_SINRC
-	#define  CHB_INIT_MODE OQPSK_RC
-	#define  CHB_INIT_MODE BPSK_40
+	#define  CHB_900MHZ_INIT_MODE OQPSK_SINRC_100    // 802.15.4-2006 compliant
+	#define  CHB_900MHZ_INIT_MODE OQPSK_SIN_250      // 802.15.4-2006 compliant
+    #define  CHB_900MHZ_INIT_MODE OQPSK_RC_250       
+    #define  CHB_900MHZ_INIT_MODE OQPSK_SIN_500
+    #define  CHB_900MHZ_INIT_MODE OQPSK_SIN_1000
+    #define  CHB_900MHZ_INIT_MODE BPSK_40
+	#define  CHB_900MHZ_INIT_MODE BPSK_20
 */
 /**************************************************************************/
-#define CHB_INIT_MODE OQPSK_SIN    
+#define CHB_2_4GHZ_INIT_MODE OQPSK_2000
+#define CHB_900MHZ_INIT_MODE OQPSK_SIN_250    
 
 /**************************************************************************/
 /*!
