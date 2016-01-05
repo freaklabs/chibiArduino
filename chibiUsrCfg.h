@@ -314,7 +314,7 @@
 	#define  CHB_900MHZ_INIT_MODE BPSK_20
 */
 /**************************************************************************/
-#define CHB_2_4GHZ_INIT_MODE OQPSK_2000
+#define CHB_2_4GHZ_INIT_MODE OQPSK_250
 #define CHB_900MHZ_INIT_MODE OQPSK_SIN_250    
 
 /**************************************************************************/
