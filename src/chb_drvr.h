@@ -137,7 +137,7 @@ enum
 
     CHB_AUTO_CRC_POS            = 7, // AT86RF23x
 //    CHB_AUTO_CRC_POS            = 5, // AT86RF212    
-
+    CHB_RX_SAFE_MODE            = 7,
     CHB_TRX_END_POS             = 3,
     CHB_TRAC_STATUS_POS         = 5,
     CHB_FVN_POS                 = 6,

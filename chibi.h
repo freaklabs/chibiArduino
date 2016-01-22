@@ -78,6 +78,7 @@ uint8_t chibiAesDecrypt(uint8_t len, uint8_t *plaintext, uint8_t *ciphertext);
 void chibiSetDataRate(uint8_t rate);
 uint8_t chibiGetRand();
 void chibiSetMode(uint8_t mode);
+uint16_t chibiBufGetRemaining();
 
 void chibiAesTest(uint8_t *key);
 

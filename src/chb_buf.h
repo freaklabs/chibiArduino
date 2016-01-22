@@ -58,5 +58,6 @@ void chb_buf_init();
 void chb_buf_write(U8 data);
 U8 chb_buf_read();
 U16 chb_buf_get_len();
+U16 chb_buf_get_remaining();
 
 #endif
