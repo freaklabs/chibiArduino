@@ -110,7 +110,7 @@
     only be used to analyze raw packet frames, like for wireshark. 
 */
 /**************************************************************************/
-#define CHIBI_PROMISCUOUS 1
+#define CHIBI_PROMISCUOUS 0
 #if (CHIBI_PROMISCUOUS == 1)
     #warning "CHIBI PROMISCUOUS MODE ENABLED"
 #endif
