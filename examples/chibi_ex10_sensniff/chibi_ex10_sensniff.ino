@@ -1,13 +1,8 @@
 /* chibiArduino Wireshark Bridge Using Sensniff, Example 10
 This sketch enables promiscuous mode on the Freakduino boards and dumps
 the raw 802.15.4 frames out to the serial port. It should be used in 
-conjunction with the sensniff-freaklabs application to feed the raw
-frames into Wireshark. 
-https://github.com/freaklabs/sensniff-freaklabs
-
-sensniff-freaklabs is a fork of sensiff, an excellent piece
-of open source software by g-oikonomou: 
-http://github.com/g-oikonomou/sensniff
+conjunction with the FreakLabs "wsbridge" application to feed the raw
+frames into Wireshark.
 
 Before using this sketch, please go into the chibiUsrCfg.h file and 
 enable promiscuous mode. To do this, change the definition:
@@ -39,6 +34,7 @@ enum
 }; 
 
 uint8_t state;
+uint8_t cnt = 0;
 uint16_t magic[] = {0xC1, 0x1F, 0xFE, 0x72};
 
 /**************************************************************************/
@@ -53,7 +49,7 @@ void setup()
   
   // Remember: If you change the speed here, make sure you change it on the application
   // program as well. 
-  Serial.begin(57600);
+  Serial.begin(230400);
 }
 
 /**************************************************************************/
@@ -61,14 +57,12 @@ void setup()
 /**************************************************************************/
 void loop()
 {
-  uint8_t channel;
   uint16_t rem;
 
   // If we receive any data from the serial port, then it's from the application. At the 
   // time of this writing, it was only used to change the channel. That might change in the future.
   if (Serial.available())
   {
-    uint8_t cnt = 0;
     uint8_t dat = Serial.read();
 
     switch (state)
@@ -76,7 +70,14 @@ void loop()
       case STATE_MAGIC:
         // go through the magic numbers. if we see the magic number,
         // then move to the next state
-        cnt = (dat == magic[cnt]) ? (cnt + 1) : 0;
+        if (dat == magic[cnt])
+        {
+          cnt++;
+        }
+        else
+        {
+          cnt = 0;
+        }
 
         // we made it through the magic numbers
         if (cnt > 3)
@@ -96,7 +97,12 @@ void loop()
       case STATE_COMMAND: 
         if (dat == CMD_GET_CHANNEL)
         {
-          state = STATE_RESPONSE;
+          // send channel response
+          send_channel_resp();
+
+          // clean up
+          state = STATE_MAGIC;
+          cnt = 0;          
         }
         else if (dat == CMD_SET_CHANNEL)
         {
@@ -109,20 +115,28 @@ void loop()
       break;
 
       case STATE_SET_CHANNEL:
+        // get len byte and just verify its correct
+        if ((dat == 1) && (Serial.available()))
+        {
+          dat = Serial.read();
+        }
+        else
+        {
+          state = STATE_MAGIC;
+        }
+
+        // get channel to set to
         if ((dat > 10) && (dat < 27))
         {
           chibiSetChannel(dat);
+
+          // send response
+          send_channel_resp();
         }
-        
-      break;
 
-      case STATE_RESPONSE:
-        channel = chibiGetChannel();
-
-        // send the header for sensniff
-        create_hdr(PROTOCOL_VERSION, CMD_CHANNEL);
-        Serial.write(1); // len
-        Serial.write(channel);
+        // clean up and go back to idle state
+        state = STATE_MAGIC;
+        cnt = 0;
       break;
     }
   }
@@ -138,7 +152,7 @@ void loop()
     len = chibiGetData(buf);
 
     // send the header for sensniff
-    create_hdr(PROTOCOL_VERSION, CMD_FRAME); 
+    send_hdr(PROTOCOL_VERSION, CMD_FRAME); 
 
     // length minus 3 bytes for no FCS and len byte
     Serial.write(len-3);
@@ -153,7 +167,7 @@ void loop()
 /**************************************************************************/
 // Build header for sensniff
 /**************************************************************************/
-void create_hdr(uint8_t ver, uint8_t cmd)
+void send_hdr(uint8_t ver, uint8_t cmd)
 {
 
   uint8_t i;
@@ -167,4 +181,18 @@ void create_hdr(uint8_t ver, uint8_t cmd)
 
   // command
   Serial.write(cmd);
+}
+
+/**************************************************************************/
+// Send channel response to  sensniff
+/**************************************************************************/
+void send_channel_resp()
+{
+   uint8_t channel = chibiGetChannel();
+
+  // send the header for sensniff
+  send_hdr(PROTOCOL_VERSION, CMD_CHANNEL);
+  Serial.write(1); // len
+  
+  Serial.write(channel);
 }
