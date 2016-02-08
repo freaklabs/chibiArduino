@@ -49,7 +49,7 @@ void setup()
   
   // Remember: If you change the speed here, make sure you change it on the application
   // program as well. 
-  Serial.begin(230400);
+  Serial.begin(57600);
 }
 
 /**************************************************************************/
