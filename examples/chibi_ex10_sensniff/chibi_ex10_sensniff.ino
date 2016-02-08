@@ -49,7 +49,7 @@ void setup()
   
   // Remember: If you change the speed here, make sure you change it on the application
   // program as well. 
-  Serial.begin(230400);
+  Serial.begin(57600);
 }
 
 /**************************************************************************/
@@ -64,7 +64,8 @@ void loop()
   if (Serial.available())
   {
     uint8_t dat = Serial.read();
-
+    //delay(1);
+    
     switch (state)
     {
       case STATE_MAGIC:
@@ -115,9 +116,12 @@ void loop()
       break;
 
       case STATE_SET_CHANNEL:
-        // get len byte and just verify its correct
-        if ((dat == 1) && (Serial.available()))
+        
+        // get len byte and just verify its correct        
+        if (dat == 1) 
         {
+          // wait for another piece of data to be available
+          while (!Serial.available());
           dat = Serial.read();
         }
         else
@@ -195,4 +199,17 @@ void send_channel_resp()
   Serial.write(1); // len
   
   Serial.write(channel);
+}
+
+/**************************************************************************/
+// This is to implement the printf function from within arduino
+/**************************************************************************/
+static int uart_putchar (char c, FILE *stream)
+{
+    #if defined(__AVR_ATmega1284P__) 
+      Serial1.write(c);
+    #else
+      Serial.write(c);
+    #endif
+    return 0;
 }
