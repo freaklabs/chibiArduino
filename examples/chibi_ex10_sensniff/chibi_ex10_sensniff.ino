@@ -64,7 +64,6 @@ void loop()
   if (Serial.available())
   {
     uint8_t dat = Serial.read();
-    //delay(1);
     
     switch (state)
     {
@@ -199,17 +198,4 @@ void send_channel_resp()
   Serial.write(1); // len
   
   Serial.write(channel);
-}
-
-/**************************************************************************/
-// This is to implement the printf function from within arduino
-/**************************************************************************/
-static int uart_putchar (char c, FILE *stream)
-{
-    #if defined(__AVR_ATmega1284P__) 
-      Serial1.write(c);
-    #else
-      Serial.write(c);
-    #endif
-    return 0;
 }
