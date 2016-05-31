@@ -941,6 +941,7 @@ void chb_sleep(U8 enb)
 
         // make the SLPTR pin an output
         CHB_SLPTR_DDIR |= _BV(CHB_SLPTR_PIN);
+        CHB_SLPTR_PORT &= ~(_BV(CHB_SLPTR_PIN));
 
         // we need to allow some time for the PLL to lock
         chb_delay_us(TIME_SLEEP_TO_TRX_OFF);
