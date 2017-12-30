@@ -9,13 +9,13 @@ The main project page is here where you can also find board support files:
 
 Tutorials:
 
-* [Installing the chibiArduino Library](https://freaklabs.org/installing-the-chibiarduino-library/)
+* <a href="https://freaklabs.org/installing-the-chibiarduino-library/" target="_blank">Installing the chibiArduino Library</a>
 
-* [Wireless Communications with Arduino 01 - Hello Wireless World](https://freaklabs.org/documentation/wireless-communications-with-chibiarduino-01-hello-wireless-world/)
+*  <a href="https://freaklabs.org/documentation/wireless-communications-with-chibiarduino-01-hello-wireless-world/" target="_blank">Wireless Communications with Arduino 01 - Hello Wireless World</a>
 
-* [Wireless Communications with Arduino 02 - Wireless Blink ](https://freaklabs.org/documentation/wireless-communications-with-chibiarduino-02-wireless-blink/)
+* <a href="https://freaklabs.org/documentation/wireless-communications-with-chibiarduino-02-wireless-blink/" target="_blank">Wireless Communications with Arduino 02 - Wireless Blink</a>
 
-* [Wireless Communications with Arduino 03 - Intro to Wireless Sensing](https://freaklabs.org/documentation/wireless-communications-with-chibiarduino-03-intro-to-wireless-sensors/)
+* <a href="https://freaklabs.org/documentation/wireless-communications-with-chibiarduino-03-intro-to-wireless-sensors/" target="_blank">Wireless Communications with Arduino 03 - Intro to Wireless Sensing</a>
 
 
 
