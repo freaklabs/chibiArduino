@@ -10,7 +10,9 @@ Tutorials:
 [Installing the chibiArduino Library](https://freaklabs.org/installing-the-chibiarduino-library/)
 
 [Wireless Communications with Arduino 01 - Hello Wireless World](https://freaklabs.org/documentation/wireless-communications-with-chibiarduino-01-hello-wireless-world/)
+
 [Wireless Communications with Arduino 02 - Wireless Blink ](https://freaklabs.org/documentation/wireless-communications-with-chibiarduino-02-wireless-blink/)
+
 [Wireless Communications with Arduino 03 - Intro to Wireless Sensing](https://freaklabs.org/documentation/wireless-communications-with-chibiarduino-03-intro-to-wireless-sensors/)
 
 
