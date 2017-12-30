@@ -1,7 +1,7 @@
 chibiArduino
 ============
 
-chibiArduino is an open source software project based on the original Chibi wireless protocol stack designed by [FreakLabs](https://www.freaklabs.org). This project ports the Chibi protocol stack to the Arduino platform so that people familiar with the Arduino will be able to communicate wirelessly using inexpensive IEEE 802.15.4 radios. Chibi means “midget” in Japanese and its appropriate for this stack because it strips wireless communications down to the fundamental operations of init, send, and receive. The stack relies heavily on the radio hardware to do most of the timing specific parts of the protocol which allows it to run without an operating system or a scheduler.
+chibiArduino is an open source software project based on the original Chibi wireless protocol library designed by [FreakLabs](https://www.freaklabs.org). The goal of this project is to have a simple, Arduino-compatible library that handles the wireless communications so the user can focus on creating interesting applications. Chibi means “midget” in Japanese and its appropriate for this stack because it strips wireless communications down to the fundamental operations of init, send, and receive. We've worked hard to take a minimalist approach to wireless to allow simple communications of wireless data so people can implement interesting and compelling wireless sensor applications. 
 
 The main project page is here where you can also find board support files:
 
