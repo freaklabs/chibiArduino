@@ -741,6 +741,12 @@ static void chb_radio_init()
     //chb_reg_write(CCA_THRES, CHB_CCA_ED_THRES);
     //chb_reg_read_mod_write(PHY_TX_PWR, CHB_TX_PWR, 0xf);
 
+#if ((FREAKDUINO_LONG_RANGE == 1) || (SABOTEN == 1) || (FREAKDUINO1284PLR == 1) || (FREAKUSB1284PLR == 1) || (ARASHI_ENET_GATEWAY_LR == 1))            
+      // enable the rf front end controller
+    tmp = chibiRegRead(TRX_CTRL1);
+    tmp |= 0x80;
+    chibiRegWrite(TRX_CTRL1, tmp);
+
 
     // identify device
     radio_id = chb_get_part_num();
@@ -790,12 +796,6 @@ static void chb_radio_init()
             // set autocrc mode
             chb_reg_read_mod_write(TRX_CTRL1, 1 << 5, 1 << 5);
         #endif
-
-        #if ((FREAKDUINO_LONG_RANGE == 1) || (SABOTEN == 1) || (FREAKDUINO1284PLR == 1) || (FREAKUSB1284PLR == 1) || (ARASHI_ENET_GATEWAY_LR == 1))            
-          // enable the rf front end controller
-          tmp = chibiRegRead(TRX_CTRL1);
-          tmp |= 0x80;
-          chibiRegWrite(TRX_CTRL1, tmp);
 
           // set the power to 5 dBm, the max for the CC1190 front end
           chb_reg_write(PHY_TX_PWR, 0x84);
