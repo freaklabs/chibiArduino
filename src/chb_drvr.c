@@ -746,7 +746,7 @@ static void chb_radio_init()
     tmp = chibiRegRead(TRX_CTRL1);
     tmp |= 0x80;
     chibiRegWrite(TRX_CTRL1, tmp);
-
+#endif
 
     // identify device
     radio_id = chb_get_part_num();
@@ -816,7 +816,6 @@ static void chb_radio_init()
             DDRB |= 1<<7;
             PORTB |= (1<<7);
           #endif
-        #endif
         break;
 
     default:
