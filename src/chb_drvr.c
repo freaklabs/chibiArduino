@@ -542,11 +542,11 @@ U8 chb_set_channel(U8 channel)
     if (radio_id == CHB_AT86RF212)
     {
       //Only the AT86RF212 is 900MHz
-      if ((channel < 0) || (channel > 11))
+      if ((channel < 0) || (channel > 10))
         return RADIO_INVALID_ARGUMENT;
     } else {
       //All other currently defined chips (AT86RF23[01]) are 2.4 GHz
-      if ((channel < 12) || (channel > 26))
+      if ((channel < 11) || (channel > 26))
         return RADIO_INVALID_ARGUMENT;
     }
     
