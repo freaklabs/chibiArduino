@@ -44,12 +44,12 @@ void setup()
 {  
   state = STATE_MAGIC;
   
-  // Init the chibi stack
-  chibiInit();              
-  
   // Remember: If you change the speed here, make sure you change it on the application
   // program as well. 
   Serial.begin(57600);
+
+  // Init the chibi stack
+  chibiInit();
 }
 
 /**************************************************************************/
@@ -129,7 +129,7 @@ void loop()
         }
 
         // get channel to set to
-        if ((dat > 10) && (dat < 27))
+        if ((dat > -1) && (dat < 27))
         {
           chibiSetChannel(dat);
 

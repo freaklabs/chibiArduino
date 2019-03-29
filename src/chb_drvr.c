@@ -535,6 +535,20 @@ U16 chb_get_short_addr()
 U8 chb_set_channel(U8 channel)
 {
     U8 state;
+
+    // Let's validate the channel for sanity before we try to set it
+    if (radio_id == CHB_AT86RF212)
+    {
+      // Only the AT86RF212 is 900MHz
+      // When set outside this range, default channel (1) seems to be used
+      if ((channel < 0) || (channel > 10))
+        return RADIO_INVALID_ARGUMENT;
+    } else {
+      // All other currently defined chips (AT86RF23[01]) are 2.4 GHz
+      // When set outside this range, something appears at 2432 MHz, not sure what though
+      if ((channel < 11) || (channel > 26))
+        return RADIO_INVALID_ARGUMENT;
+    }
     
     chb_reg_read_mod_write(PHY_CC_CCA, channel, 0x1f); 
 
