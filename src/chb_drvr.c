@@ -823,7 +823,7 @@ static void chb_radio_init()
           #if (ARASHI_ENET_GATEWAY_LR == 1)
             DDRC |= 1<<5;
             PORTC |= 1<<5; 
-          #elif ((SABOTEN == 1) || (FREAKUSB1284PLR == 1) || (FREAKDUINO1284P == 1))
+          #elif ((SABOTEN == 1) || (FREAKUSB1284PLR == 1) || (FREAKDUINO1284PLR == 1) || (FREAKDUINO1284P == 1))
             DDRC |= 1<<6;
             PORTC |= 1<<6;
           #else
