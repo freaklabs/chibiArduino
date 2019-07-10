@@ -129,7 +129,7 @@ void loop()
         }
 
         // get channel to set to
-        if ((dat > -1) && (dat < 27))
+        if ((dat >= 0) && (dat < 27))
         {
           chibiSetChannel(dat);
 
