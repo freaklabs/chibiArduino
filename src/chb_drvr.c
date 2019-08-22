@@ -535,6 +535,20 @@ U16 chb_get_short_addr()
 U8 chb_set_channel(U8 channel)
 {
     U8 state;
+
+    // Let's validate the channel for sanity before we try to set it
+    if (radio_id == CHB_AT86RF212)
+    {
+      // Only the AT86RF212 is 900MHz
+      // When set outside this range, default channel (1) seems to be used
+      if ((channel < 0) || (channel > 10))
+        return RADIO_INVALID_ARGUMENT;
+    } else {
+      // All other currently defined chips (AT86RF23[01]) are 2.4 GHz
+      // When set outside this range, something appears at 2432 MHz, not sure what though
+      if ((channel < 11) || (channel > 26))
+        return RADIO_INVALID_ARGUMENT;
+    }
     
     chb_reg_read_mod_write(PHY_CC_CCA, channel, 0x1f); 
 
@@ -806,13 +820,12 @@ static void chb_radio_init()
         // all data rates.
         chb_reg_read_mod_write(XOSC_CTRL, 0x04, 0x0F);
 
-        #if (CHIBI_PROMISCUOUS == 0)
-            // set autocrc mode
-            chb_reg_read_mod_write(TRX_CTRL1, 1 << 5, 1 << 5);
-        #endif
-
-          // set the power to 5 dBm, the max for the CC1190 front end
-          chb_reg_write(PHY_TX_PWR, 0x84);
+#if (CHIBI_PROMISCUOUS == 0)
+        // set autocrc mode
+        chb_reg_read_mod_write(TRX_CTRL1, 1 << 5, 1 << 5);
+#endif
+          // set the power to max 10 dB
+          chb_reg_write(PHY_TX_PWR, 0xE1);
 
           // set crystal trim to improve signal reception
           // found that a value of 0xA works well across all channels &
@@ -821,9 +834,13 @@ static void chb_radio_init()
 
           // enable the high gain mode pin on the rx amp
           #if (ARASHI_ENET_GATEWAY_LR == 1)
+            // set the power to 5 dBm, the max for the CC1190 front end
+            chb_reg_write(PHY_TX_PWR, 0x84);
             DDRC |= 1<<5;
             PORTC |= 1<<5; 
-          #elif ((SABOTEN == 1) || (FREAKUSB1284PLR == 1) || (FREAKDUINO1284P == 1))
+          #elif ((SABOTEN == 1) || (FREAKUSB1284PLR == 1) || (FREAKDUINO1284PLR == 1) || (FREAKDUINO1284P == 1))
+            // set the power to 5 dBm, the max for the CC1190 front end
+            chb_reg_write(PHY_TX_PWR, 0x84);
             DDRC |= 1<<6;
             PORTC |= 1<<6;
           #else
