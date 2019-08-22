@@ -80,6 +80,7 @@ void chibiSetDataRate(uint8_t rate);
 uint8_t chibiGetRand();
 void chibiSetMode(uint8_t mode);
 uint16_t chibiBufGetRemaining();
+void chibiSetRetries(uint8_t);
 
 void chibiAesTest(uint8_t *key);
 

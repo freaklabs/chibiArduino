@@ -63,6 +63,8 @@
 #define CHB_SLPTR_ENABLE()  do {CHB_SLPTR_PORT |= (_BV(CHB_SLPTR_PIN));} while (0)
 #define CHB_SLPTR_DISABLE() do {CHB_SLPTR_PORT &= ~(_BV(CHB_SLPTR_PIN));} while (0)
 
+#define MAX_RETRIES 10
+
 enum
 {
     CCA_ED                    = 1,    /**< Use energy detection above threshold mode. */
@@ -289,6 +291,8 @@ U8 chb_get_part_num();
 U8 chb_set_datarate(U8 rate);
 U8 chb_get_rand();
 void chb_set_mode();
+void chb_set_retries(uint8_t retries);
+
 
 // data transmit
 U8 chb_tx(U8 *hdr, U8 *data, U8 len);

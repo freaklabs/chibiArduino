@@ -713,6 +713,20 @@ U8 chb_get_part_num()
     }
 #endif
 
+
+/**************************************************************************/
+/*!
+    chb_set_retries
+*/
+/**************************************************************************/
+void chb_set_retries(uint8_t retries)
+{
+    if (retries < MAX_RETRIES)
+    {
+        chb_reg_read_mod_write(XAH_CTRL_0, retries << CHB_MAX_FRAME_RETRIES_POS, 0xF << CHB_MAX_FRAME_RETRIES_POS);
+    }
+}
+
 /**************************************************************************/
 /*!
     Initialize the radio registers.
