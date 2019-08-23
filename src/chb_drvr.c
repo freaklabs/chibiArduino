@@ -824,29 +824,30 @@ static void chb_radio_init()
         // set autocrc mode
         chb_reg_read_mod_write(TRX_CTRL1, 1 << 5, 1 << 5);
 #endif
-          // set the power to max 10 dB
-          chb_reg_write(PHY_TX_PWR, 0xE1);
 
           // set crystal trim to improve signal reception
           // found that a value of 0xA works well across all channels &
           // all modes w/long range board.
           chb_reg_read_mod_write(XOSC_CTRL, 0x0A, 0x0F);
 
-          // enable the high gain mode pin on the rx amp
-          #if (ARASHI_ENET_GATEWAY_LR == 1)
+        #if ((SABOTEN == 1) || (FREAKUSB1284PLR == 1) || (FREAKDUINO1284PLR == 1) || (FREAKDUINO_LONG_RANGE == 1) || (FREAKUSBLR == 1) || (ARASHI_ENET_GATEWAY_LR == 1))
             // set the power to 5 dBm, the max for the CC1190 front end
             chb_reg_write(PHY_TX_PWR, 0x84);
-            DDRC |= 1<<5;
-            PORTC |= 1<<5; 
-          #elif ((SABOTEN == 1) || (FREAKUSB1284PLR == 1) || (FREAKDUINO1284PLR == 1) || (FREAKDUINO1284P == 1))
-            // set the power to 5 dBm, the max for the CC1190 front end
-            chb_reg_write(PHY_TX_PWR, 0x84);
-            DDRC |= 1<<6;
-            PORTC |= 1<<6;
-          #else
-            DDRB |= 1<<7;
-            PORTB |= (1<<7);
-          #endif
+
+                  // enable the high gain mode pin on the rx amp
+            #if (ARASHI_ENET_GATEWAY_LR == 1)
+                DDRC |= 1<<5;
+                PORTC |= 1<<5; 
+            #elif ((SABOTEN == 1) || (FREAKUSB1284PLR == 1) || (FREAKDUINO1284PLR == 1))
+                DDRC |= 1<<6;
+                PORTC |= 1<<6;
+            #else
+                DDRB |= 1<<7;
+                PORTB |= (1<<7);
+            #endif
+        #endif
+
+
         break;
 
     default:
