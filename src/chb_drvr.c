@@ -350,6 +350,15 @@ U8 chb_get_rand()
 
 /**************************************************************************/
 /*!
+*/
+/**************************************************************************/
+uint8_t chb_get_mode()
+{
+    return chb_reg_read(TRX_CTRL_2);
+}
+
+/**************************************************************************/
+/*!
     This function is only for the AT86RF212 868/915 MHz chips.
     Set the channel mode, BPSK, OQPSK, etc...
 */
@@ -746,7 +755,7 @@ void chb_set_retries(uint8_t retries)
     Initialize the radio registers.
 */
 /**************************************************************************/
-static void chb_radio_init()
+static uint8_t chb_radio_init()
 {
     U8 ieee_addr[8];
     U8 rnd, tmp;
@@ -882,12 +891,7 @@ static void chb_radio_init()
     // make sure we're in the right state
     if (chb_get_state() != RX_STATE)
     {
-        // ERROR occurred initializing the radio. Print out error message.
-        char buf[50];
-
-        // grab the error message from flash & print it out
-        strcpy_P(buf, chb_err_init);
-        Serial.print(buf);
+        return 0;
     }
 
     // init the CSMA random seed value
@@ -903,6 +907,7 @@ static void chb_radio_init()
         rnd = chb_get_rand();
         chb_reg_write(CSMA_SEED_0, rnd);
     } 
+    return 1;
 }
 
 /**************************************************************************/
@@ -912,6 +917,8 @@ static void chb_radio_init()
 /**************************************************************************/
 void chb_drvr_init()
 {
+    char buf[50];
+    
     // config SPI for at86rf230 access
     chb_spi_init();
 
@@ -920,7 +927,17 @@ void chb_drvr_init()
     CHB_SLPTR_DISABLE();
 
     // config radio
-    chb_radio_init();
+    for (int i=0; i<3; i++)
+    {
+        if (chb_radio_init()) 
+        {
+            return;
+        }
+        delay(100);
+    }
+    // radio could not be initialized. Print out error message.
+    strcpy_P(buf, chb_err_init);
+    Serial.print(buf);
 }
 
 /**************************************************************************/

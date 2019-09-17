@@ -291,6 +291,7 @@ U8 chb_get_part_num();
 U8 chb_set_datarate(U8 rate);
 U8 chb_get_rand();
 void chb_set_mode();
+uint8_t chb_get_mode();
 void chb_set_retries(uint8_t retries);
 
 
