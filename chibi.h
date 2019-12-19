@@ -53,6 +53,7 @@
 #define BROADCAST_ADDR 0xFFFF
 
 void chibiInit();
+void chibiDisplayFlags(char prompt, char echo);
 void chibiSetShortAddr(uint16_t addr);
 uint16_t chibiGetShortAddr();
 void chibiSetIEEEAddr(uint8_t *ieee_addr);

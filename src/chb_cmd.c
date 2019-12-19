@@ -61,6 +61,9 @@ const char cmd_banner[] PROGMEM = "*************** CHIBI *******************";
 const char cmd_prompt[] PROGMEM = "CHIBI >> ";
 const char cmd_unrecog[] PROGMEM = "CHIBI: Command not recognized.";
 
+int cmd_prompt_flag = 1;
+int cmd_echo_flag = 1;
+
 /**************************************************************************/
 /*!
     Generate the main command prompt
@@ -68,6 +71,9 @@ const char cmd_unrecog[] PROGMEM = "CHIBI: Command not recognized.";
 /**************************************************************************/
 static void chb_cmd_display()
 {
+    if(cmd_prompt_flag==0)
+        return;
+
     char buf[50];
 
     Serial.println();
@@ -142,14 +148,20 @@ static void chb_cmd_handler()
         // terminate the msg and reset the msg ptr. then send
         // it to the handler for processing.
         *msg_ptr = '\0';
-        Serial.print("\r\n");
+        if(cmd_echo_flag==1)
+        {
+            Serial.print("\r\n");
+        }
         chb_cmd_parse((char *)msg);
         msg_ptr = msg;
         break;
     
     case '\b':
         // backspace 
-        Serial.print(c);
+        if(cmd_echo_flag==1)
+        {
+            Serial.print(c);
+        }
         if (msg_ptr > msg)
         {
             msg_ptr--;
@@ -162,7 +174,10 @@ static void chb_cmd_handler()
         if ((msg_ptr - msg) < (MAX_MSG_SIZE - 1))
         {
             // normal character entered. add it to the buffer
-            Serial.print(c);
+            if(cmd_echo_flag==1)
+            {
+                Serial.print(c);
+            }
             *msg_ptr++ = c;
         }
         break;
