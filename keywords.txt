@@ -9,33 +9,33 @@
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
-chibiInit	        KEYWORD2
+chibiInit	KEYWORD2
 chibiSetShortAddr	KEYWORD2
 chibiGetShortAddr	KEYWORD2
 chibiSetIEEEAddr	KEYWORD2
 chibiGetIEEEAddr	KEYWORD2
-chibiRegRead	    KEYWORD2
-chibiRegWrite	    KEYWORD2
-chibiTx	KEYWORD2	
-chibiDataRcvd	    KEYWORD2
-chibiGetData	    KEYWORD2
-chibiGetRSSI	    KEYWORD2
-chibiGetSrcAddr	    KEYWORD2
-chibiSetChannel	    KEYWORD2
-chibiSleepRadio	    KEYWORD2
-chibiCmdInit	    KEYWORD2
-chibiCmdPoll	    KEYWORD2
-chibiCmdAdd         KEYWORD2
-chibiCmdStr2Num	    KEYWORD2
-chibiGetPartID      KEYWORD2
-chibiAesInit        KEYWORD2
-chibiAesEncrypt     KEYWORD2
-chibiAesDecrypt     KEYWORD2
-chibiSetDataRate    KEYWORD2
-chibiGetRand        KEYWORD2
-chibiSetMode        KEYWORD2
-chibiHighGainModeEnable     KEYWORD2
-chibiHighGainModeDisable    KEYWORD2
+chibiRegRead	KEYWORD2
+chibiRegWrite	KEYWORD2
+chibiTx	KEYWORD2
+chibiDataRcvd	KEYWORD2
+chibiGetData	KEYWORD2
+chibiGetRSSI	KEYWORD2
+chibiGetSrcAddr	KEYWORD2
+chibiSetChannel	KEYWORD2
+chibiSleepRadio	KEYWORD2
+chibiCmdInit	KEYWORD2
+chibiCmdPoll	KEYWORD2
+chibiCmdAdd	KEYWORD2
+chibiCmdStr2Num	KEYWORD2
+chibiGetPartID	KEYWORD2
+chibiAesInit	KEYWORD2
+chibiAesEncrypt	KEYWORD2
+chibiAesDecrypt	KEYWORD2
+chibiSetDataRate	KEYWORD2
+chibiGetRand	KEYWORD2
+chibiSetMode	KEYWORD2
+chibiHighGainModeEnable	KEYWORD2
+chibiHighGainModeDisable	KEYWORD2
 
 
 
