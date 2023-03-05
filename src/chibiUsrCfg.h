@@ -40,8 +40,7 @@
 
 */
 /**************************************************************************/
-#ifndef CHB_USR_CFG_H
-#define CHB_USR_CFG_H
+#pragma once
 
 /**************************************************************************/
 /*!
@@ -67,6 +66,11 @@
     #define USE_PINCHANGE_INTP  1
     #define CHB_INTP_PORT       PINB
     #define CHB_INTP_PIN        6
+#elif (ILLUMINADO_RX2 == 1)
+    #warning "ChibiArduino Notification: Illuminado Receiver v1.3b, 3.3V, 8 MHz, ATMega328P board selected"
+    #define USE_PINCHANGE_INTP  0
+    #define CHB_INTP_PORT       PIND
+    #define CHB_INTP_PIN        3
 // Illuminado Transmitter Boards
 #elif (ILLUMINADO_TX == 1)
     #warning "ChibiArduino Notification: Illuminado Transmitter, 5.0V, 16 MHz, ATMega328P board selected"
@@ -98,10 +102,17 @@
     #define CHB_INTP_PORT       PINA
     #define CHB_INTP_PIN        6
 #else
-    #warning "ChibiArduino Notification: No board selected. Defaulting to Freakduino Standard."
-    #define USE_PINCHANGE_INTP  1
-    #define CHB_INTP_PORT       PINB
-    #define CHB_INTP_PIN        6
+    #ifdef MEGACOREX
+        #warning "ChibiArduino Notification: ATMEGAXX08, 3.3V, 8 MHz."
+        #define ILLUMINADO_ATMEGA4808  1
+        #define USE_PINCHANGE_INTP  2
+        #define PIN_CSN PIN_PA7
+    #else
+        #warning "ChibiArduino Notification: No board selected. Defaulting to Freakduino Standard."
+        #define USE_PINCHANGE_INTP  1
+        #define CHB_INTP_PORT       PINB
+        #define CHB_INTP_PIN        6
+    #endif
 #endif
 
 /**************************************************************************/
@@ -162,6 +173,10 @@
     #define CHB_SLPTR_PORT       PORTA
     #define CHB_SLPTR_DDIR       DDRA
     #define CHB_SLPTR_PIN        5
+#elif (ILLUMINADO_ATMEGA4808 == 1)
+    #define CHB_SLPTR_PORT
+    #define CHB_SLPTR_DDIR
+    #define CHB_SLPTR_PIN
 #else
     #define CHB_SLPTR_PORT       PORTC
     #define CHB_SLPTR_DDIR       DDRC
@@ -182,6 +197,10 @@
     #define CHB_SPI_CS_PORT PORTC
     #define CHB_SPI_CS_DDIR DDRC
     #define CHB_SPI_CS_PIN  7                 // PC.3 - SPI Chip Select (SSEL)
+#elif (ILLUMINADO_ATMEGA4808 == 1)
+    #define CHB_SPI_CS_PORT 
+    #define CHB_SPI_CS_DDIR 
+    #define CHB_SPI_CS_PIN      
 #else
     #define CHB_SPI_CS_PORT PORTC
     #define CHB_SPI_CS_DDIR DDRC
@@ -198,6 +217,8 @@
 /**************************************************************************/
 #if (USE_PINCHANGE_INTP == 1)
     #define CHB_RADIO_IRQ       PCINT0_vect
+#elif (USE_PINCHANGE_INTP == 2)
+    #define CHB_RADIO_IRQ       
 #else
     #define CHB_RADIO_IRQ       INT1_vect
 #endif
@@ -216,6 +237,9 @@
                     PCICR |= _BV(PCIE0);    \
                 }                           \
                 while(0)
+#elif (USE_PINCHANGE_INTP == 2)
+    #define CFG_CHB_INTP() do                           \
+                    {} while(0)
 #else
     #define CFG_CHB_INTP() do                           \
                 {                                       \
@@ -238,6 +262,9 @@
 #if (USE_PINCHANGE_INTP == 1)
     #define CHB_IRQ_DISABLE() do {PCMSK0 &= ~_BV(PCINT6);} while(0)
     #define CHB_IRQ_ENABLE() do {PCMSK0 |= _BV(PCINT6);} while(0)
+#elif (USE_PINCHANGE_INTP == 2)
+    #define CHB_IRQ_DISABLE()
+    #define CHB_IRQ_ENABLE()                  
 #else
     #define CHB_IRQ_DISABLE() do {EIMSK &= ~_BV(INT1);} while(0)
     #define CHB_IRQ_ENABLE() do {EIMSK |= _BV(INT1);} while(0)
@@ -430,5 +457,3 @@
 */
 /**************************************************************************/
 #define CHB_CCA_ED_THRES    0x7
-
-#endif

@@ -1,3 +1,5 @@
+#pragma once
+
 /*******************************************************************
     Copyright (C) 2009 FreakLabs
     All rights reserved.
@@ -31,13 +33,65 @@
     Please post support questions to the FreakLabs forum.
 
 *******************************************************************/
-#ifndef CHIBI_DRVR_H
-#define CHIBI_DRVR_H
 
-#include <avr/io.h>
-#include <avr/interrupt.h>
+// For handling Arduino 1.0 compatibility and backwards compatibility
+#if ARDUINO >= 100
+    #include "Arduino.h"
+#else
+    #include "WProgram.h"
+#endif
+
+#include <SPI.h>
+#include <avr/eeprom.h>
 #include "chibiUsrCfg.h"
-#include "types.h"       
+
+#define BROADCAST_ADDR 0xFFFF
+
+#define CHB_HDR_SZ        9    // FCF + seq + pan_id + dest_addr + src_addr (2 + 1 + 2 + 2 + 2)
+#define CHB_FCS_LEN       2
+
+// frame_type = data
+// security enabled = false
+// frame pending = false
+// ack request = false
+// pan ID compression = true
+#define CHB_FCF_BYTE_0    0x41    
+
+// dest addr = 16-bit
+// frame version = 802.15.4 (not 2003)
+// src addr = 16-bit
+#define CHB_FCF_BYTE_1    0x98
+
+#define CHB_ACK_REQ_POS   5
+
+#if (ILLUMINADO_ATMEGA4808 == 1)
+    #define CHB_SPI_ENABLE()    digitalWriteFast(PIN_CSN, LOW)
+    #define CHB_SPI_DISABLE()   digitalWriteFast(PIN_CSN, HIGH)
+    #define CHB_SLPTR_ENABLE()  
+    #define CHB_SLPTR_DISABLE()
+#else
+    #define CHB_SPI_ENABLE()    do {CHB_SPI_CS_PORT &= ~(_BV(CHB_SPI_CS_PIN));} while (0)
+    #define CHB_SPI_DISABLE()   do {CHB_SPI_CS_PORT |= _BV(CHB_SPI_CS_PIN);} while (0)
+    #define CHB_SLPTR_ENABLE()  do {CHB_SLPTR_PORT |= (_BV(CHB_SLPTR_PIN));} while (0)
+    #define CHB_SLPTR_DISABLE() do {CHB_SLPTR_PORT &= ~(_BV(CHB_SLPTR_PIN));} while (0)
+
+    #if defined(__AVR_ATmega1284P__)
+        #define CHB_SPI_PORT    PORTB
+        #define CHB_SPI_DDIR    DDRB
+        #define CHB_SCK         7                 // PB.5 - Output: SPI Serial Clock (SCLK)
+        #define CHB_MOSI        5                 // PB.3 - Output: SPI Master out - slave in (MOSI)
+        #define CHB_MISO        6                 // PB.4 - Input:  SPI Master in - slave out (MISO)
+        #define CHB_SPI_SELN    4                 // PB.2 - Input: The dedicated SPI CS pin needs to have internal pullup enabled if an input
+    #else
+        /* Note: The SPI chip select pin is defined in chibiUsrCfg.h */
+        #define CHB_SPI_PORT    PORTB
+        #define CHB_SPI_DDIR    DDRB
+        #define CHB_SCK         5                 // PB.5 - Output: SPI Serial Clock (SCLK)
+        #define CHB_MOSI        3                 // PB.3 - Output: SPI Master out - slave in (MOSI)
+        #define CHB_MISO        4                 // PB.4 - Input:  SPI Master in - slave out (MISO)
+        #define CHB_SPI_SELN    2                 // PB.2 - Input: The dedicated SPI CS pin needs to have internal pullup enabled if an input
+    #endif
+#endif
 
 #define CHB_CC1190_PRESENT      0       /// Set to 1 if CC1190 is being used
 #define CHB_CHINA               0       /// Support 780 MHz Chinese band        
@@ -60,10 +114,20 @@
 #define CHB_ENTER_CRIT()    {U8 volatile saved_sreg = SREG; cli()
 #define CHB_LEAVE_CRIT()    SREG = saved_sreg;}
 
-#define CHB_SLPTR_ENABLE()  do {CHB_SLPTR_PORT |= (_BV(CHB_SLPTR_PIN));} while (0)
-#define CHB_SLPTR_DISABLE() do {CHB_SLPTR_PORT &= ~(_BV(CHB_SLPTR_PIN));} while (0)
-
 #define MAX_RETRIES 10
+
+/**************************************************************************/
+/*!
+    If promiscuous mode is enabled, then we don't want to use the extended
+    hardware features of the chip. We want raw frames that are unacknowledged.
+*/
+/**************************************************************************/
+#if (CHIBI_PROMISCUOUS)
+    #define RX_STATE RX_ON
+#else
+    #define RX_STATE RX_AACK_ON
+#endif
+
 
 enum
 {
@@ -250,57 +314,102 @@ enum
     CHB_RATE_2000KBPS = 3
 };
 
-/**************************************************************************/
-/*!
-    If promiscuous mode is enabled, then we don't want to use the extended
-    hardware features of the chip. We want raw frames that are unacknowledged.
-*/
-/**************************************************************************/
-#if (CHIBI_PROMISCUOUS)
-    #define RX_STATE RX_ON
-#else
-    #define RX_STATE RX_AACK_ON
-#endif
+enum
+{
+    CHB_SUCCESS                 = 0,
+    CHB_SUCCESS_DATA_PENDING    = 1,
+    CHB_CHANNEL_ACCESS_FAILURE  = 3,
+    CHB_NO_ACK                  = 5,
+    CHB_INVALID                 = 7
+};
 
-/**************************************************************************/
-/*!
-    Function Prototypes
-*/
-/**************************************************************************/
-// init 
-void chb_drvr_init();
+typedef struct
+{
+    uint16_t src_addr;
+    uint8_t seq;
+    volatile bool data_rcv;
+    volatile bool trx_end;
 
-// data access
-U8 chb_reg_read(U8 addr);
-U16 chb_reg_read16(U8 addr);
-void chb_reg_write(U8 addr, U8 val);
-void chb_reg_write16(U8 addr, U16 val);
-void chb_reg_write64(U8 addr, U8 *val);
-void chb_reg_read_mod_write(U8 addr, U8 val, U8 mask);
-void chb_frame_write(U8 *hdr, U8 hdr_len, U8 *data, U8 data_len);
+    // stats
+    uint16_t rcvd_xfers;
+    uint16_t txd_success;
+    uint16_t txd_noack;
+    uint16_t txd_channel_fail;
+    uint16_t overflow;
+    uint16_t underrun;
+    uint8_t battlow;
+    uint8_t status;
+    uint8_t ed;
+    uint8_t crc;
+} pcb_t;
 
-// general configuration
-U8 chb_set_channel(U8 channel);
-U8 chb_get_channel();
-void chb_set_ieee_addr(U8 *addr);
-void chb_get_ieee_addr(U8 *addr);
-void chb_set_short_addr(U16 addr);
-U16 chb_get_short_addr();
-void chb_sleep(U8 enb);
-U8 chb_get_part_num();
-U8 chb_set_datarate(U8 rate);
-U8 chb_get_rand();
-void chb_set_mode();
-uint8_t chb_get_mode();
-void chb_set_retries(uint8_t retries);
+typedef struct
+{
+    uint8_t len;
+    uint16_t src_addr;
+    uint16_t dest_addr;
+    uint8_t *data;
+} chb_rx_data_t;
 
+class ChibiArduinoTest
+{
+public:
+	uint8_t pinCs;
+	uint8_t pinSlpTr;
 
-// data transmit
-U8 chb_tx(U8 *hdr, U8 *data, U8 len);
+	ChibiArduinoTest(uint8_t cs, uint8_t slptr);
+	void begin();
+	void setShortAddr(uint16_t addr);
+	uint16_t getShortAddr();
+	void setIEEEAddr(uint8_t *ieee_addr);
+	void getIEEEAddr(uint8_t *ieee_addr);
+	uint8_t regRead(uint8_t addr);
+    uint8_t read(chb_rx_data_t *rx);
+    uint8_t send(uint16_t addr, uint8_t *data, uint8_t len);
+	void regWrite(uint8_t addr, uint8_t val);
+	uint8_t dataRcvd();
+	uint8_t getData(uint8_t *data);
+	uint8_t getRSSI();
+	uint16_t getSrcAddr();
+	uint8_t setChannel(uint8_t channel);
+	uint8_t getChannel();
+	uint8_t getPartID();
+	void sleepRadio(uint8_t enb);
+	void setDataRate(uint8_t rate);
+	uint8_t getRand();
+	void setMode(uint8_t mode);
+	uint8_t getMode();
+	void setRetries(uint8_t);
+    void highGainModeEnable();
+    void highGainModeDisable();	
+    pcb_t *getPCB();
+    void interruptHandler();
 
-#if ((FREAKDUINO_LONG_RANGE == 1) || (SABOTEN == 1) || (FREAKDUINO1284PLR == 1) || (FREAKUSB1284PLR == 1) || (ARASHI_ENET_GATEWAY_LR == 1))  
-    void chb_high_gain_mode_enable();
-    void chb_high_gain_mode_disable();
-#endif
+	//void aesInit(uint8_t *key);
+	//uint8_t aesEncrypt(uint8_t len, uint8_t *plaintext, uint8_t *ciphertext);
+	//uint8_t aesDecrypt(uint8_t len, uint8_t *plaintext, uint8_t *ciphertext);
+    //void aesTest(uint8_t *key); 
 
-#endif
+private:
+	uint8_t radioInit();
+    uint8_t tx(uint8_t *hdr, uint8_t *data, uint8_t len);
+	uint8_t setState(uint8_t state);
+	uint8_t getState();
+	uint8_t getStatus();
+	void delayUS(uint16_t usec);
+	uint16_t regRead16(uint8_t addr);
+	void regWrite16(uint8_t addr, uint16_t val);
+	void regWrite64(uint8_t addr, uint8_t *val);
+	void regReadModWrite(uint8_t addr, uint8_t val, uint8_t mask);
+	void frameWrite(uint8_t *hdr, uint8_t hdr_len, uint8_t *data, uint8_t data_len);
+	void frameRead();
+	uint8_t genHeader(uint8_t *hdr, uint16_t addr, uint8_t len);
+	void bufWrite(uint8_t data);
+	uint8_t bufRead();
+	uint16_t bufGetLen();
+	uint16_t bufGetRemaining();
+	void eepromWrite(uint16_t addr, uint8_t *buf, uint16_t size);
+	void eepromRead(uint16_t addr, uint8_t *buf, uint16_t size);
+    //void spiInit();
+    //uint8_t spiTransfer(uint8_t data);
+};
