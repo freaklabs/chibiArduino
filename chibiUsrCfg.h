@@ -40,7 +40,8 @@
 
 */
 /**************************************************************************/
-#pragma once
+#ifndef CHB_USR_CFG_H
+#define CHB_USR_CFG_H
 
 /**************************************************************************/
 /*!
@@ -106,7 +107,6 @@
         #warning "ChibiArduino Notification: ATMEGAXX08, 3.3V, 8 MHz."
         #define ILLUMINADO_ATMEGA4808  1
         #define USE_PINCHANGE_INTP  2
-        #define PIN_CSN PIN_PA7
     #else
         #warning "ChibiArduino Notification: No board selected. Defaulting to Freakduino Standard."
         #define USE_PINCHANGE_INTP  1
@@ -457,3 +457,5 @@
 */
 /**************************************************************************/
 #define CHB_CCA_ED_THRES    0x7
+
+#endif
