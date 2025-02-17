@@ -61,6 +61,11 @@
     #define USE_PINCHANGE_INTP  1
     #define CHB_INTP_PORT       PINB
     #define CHB_INTP_PIN        6
+#elif ((FREAKUSB3 == 1) || (FREAKUSBLR == 1))
+    #warning "ChibiArduino Notification: FreakUSB3, 3.3V, 8 MHz, ATMega328P board selected"
+    #define USE_PINCHANGE_INTP  3
+    #define CHB_INTP_PORT       PIND
+    #define CHB_INTP_PIN        2
 // Illuminado Receiver Boards
 #elif (ILLUMINADO_RX == 1)
     #warning "ChibiArduino Notification: Illuminado Receiver, 3.3V, 8 MHz, ATMega328P board selected"
@@ -218,7 +223,9 @@
 #if (USE_PINCHANGE_INTP == 1)
     #define CHB_RADIO_IRQ       PCINT0_vect
 #elif (USE_PINCHANGE_INTP == 2)
-    #define CHB_RADIO_IRQ       
+    #define CHB_RADIO_IRQ     
+#elif (USE_PINCHANGE_INTP == 3)
+    #define CHB_RADIO_IRQ       INT0_vect   
 #else
     #define CHB_RADIO_IRQ       INT1_vect
 #endif
@@ -240,6 +247,13 @@
 #elif (USE_PINCHANGE_INTP == 2)
     #define CFG_CHB_INTP() do                           \
                     {} while(0)
+#elif (USE_PINCHANGE_INTP == 3)
+    #define CFG_CHB_INTP() do                           \
+                {                                       \
+                    EICRA |= _BV(ISC01) | _BV(ISC00);   \
+                    EIMSK |= _BV(INT0);                 \
+                }                                       \
+                while (0)
 #else
     #define CFG_CHB_INTP() do                           \
                 {                                       \
@@ -265,6 +279,9 @@
 #elif (USE_PINCHANGE_INTP == 2)
     #define CHB_IRQ_DISABLE()
     #define CHB_IRQ_ENABLE()                  
+#elif (USE_PINCHANGE_INTP == 3)
+    #define CHB_IRQ_DISABLE() do {EIMSK &= ~_BV(INT0);} while(0)
+    #define CHB_IRQ_ENABLE() do {EIMSK |= _BV(INT0);} while(0)                        
 #else
     #define CHB_IRQ_DISABLE() do {EIMSK &= ~_BV(INT1);} while(0)
     #define CHB_IRQ_ENABLE() do {EIMSK |= _BV(INT1);} while(0)
